@@ -1,8 +1,9 @@
-﻿using System;
-using FishNet;
+﻿using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Object;
+using Script.Networking.Lobby;
+using Script.Player.LobbyPlayer.View;
 using UnityEngine;
 using Zenject;
 
@@ -11,9 +12,16 @@ namespace Script.Player.LobbyPlayer.Network
     public class LobbyPlayerSpawner: MonoBehaviour
     {
         private NetworkManager _networkManager;
+        private LobbyServerController _lobbyServerController;
         
         [SerializeField] private NetworkObject _lobbyPlayerPrefab;
 
+        [Inject]
+        private void Construct(LobbyServerController lobbyServerController)
+        {
+            _lobbyServerController = lobbyServerController;
+        }
+        
         private void Awake()
         {
             _networkManager = InstanceFinder.NetworkManager;
@@ -47,6 +55,9 @@ namespace Script.Player.LobbyPlayer.Network
             objTransform.localScale = Vector3.one;
             
             _networkManager.ServerManager.Spawn(obj, conn);
+
+            var lobbyPlayerView = obj.GetComponent<LobbyPlayerView>();
+            _lobbyServerController.AddLobbyPlayer(lobbyPlayerView);
         }
     }
 }

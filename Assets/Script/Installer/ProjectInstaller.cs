@@ -1,6 +1,7 @@
 using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using Script.Networking;
+using Script.Networking.Signal;
 using Script.Player.LobbyPlayer.Signal;
 using UnityEngine;
 using Zenject;

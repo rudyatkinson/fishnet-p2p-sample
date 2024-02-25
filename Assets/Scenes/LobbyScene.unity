@@ -153,7 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f56fc266da4237baeed8af1fd31d48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lobbyPlayerServerController: {fileID: 1953358620}
+  _lobbyServerController: {fileID: 1953358620}
+  _lobbyPlayerSpawner: {fileID: 1673500890}
 --- !u!114 &444520938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -461,9 +462,9 @@ MonoBehaviour:
   <NestedRootNetworkBehaviours>k__BackingField:
   - {fileID: 1673500892}
   SerializedTransformProperties:
-    Position: {x: 372.5, y: 209.5, z: 0}
+    Position: {x: 497, y: 279.5, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
-    LocalScale: {x: 0.38802084, y: 0.38802084, z: 0.38802084}
+    LocalScale: {x: 0.51770836, y: 0.51770836, z: 0.51770836}
   _isNetworked: 1
   _isSpawnable: 1
   _isGlobal: 0
@@ -586,7 +587,7 @@ MonoBehaviour:
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 1505568122}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
-    Position: {x: 0, y: 414.91943, z: 0}
+    Position: {x: 0, y: 414.87927, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     LocalScale: {x: 1, y: 1, z: 1}
   _isNetworked: 1

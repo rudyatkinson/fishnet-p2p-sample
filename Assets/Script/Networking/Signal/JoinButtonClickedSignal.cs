@@ -1,4 +1,4 @@
-﻿namespace Script.Networking
+﻿namespace Script.Networking.Signal
 {
     public class JoinButtonClickedSignal
     {

@@ -3,7 +3,7 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using FishNet.Transporting.Tugboat;
-using UnityEngine;
+using Script.Networking.Signal;
 using Zenject;
 
 namespace Script.Networking

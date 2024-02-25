@@ -1,6 +1,6 @@
-﻿using System;
-using FishNet.Object;
+﻿using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using Script.Networking.Lobby;
 using Script.Player.LobbyPlayer.Signal;
 using TMPro;
 using UnityEngine;
@@ -12,6 +12,7 @@ namespace Script.Player.LobbyPlayer.View
     public class LobbyPlayerView: NetworkBehaviour
     {
         private SignalBus _signalBus;
+        private LobbyServerController _lobbyServerController;
         
         [SerializeField] private TMP_Text _name;
         [SerializeField] private Button _readyButton;
@@ -19,9 +20,11 @@ namespace Script.Player.LobbyPlayer.View
         public readonly SyncVar<bool> IsReady = new(false, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
 
         [Inject]
-        private void Construct(SignalBus signalBus)
+        private void Construct(SignalBus signalBus,
+            LobbyServerController lobbyServerController)
         {
             _signalBus = signalBus;
+            _lobbyServerController = lobbyServerController;
         }
         
         private void OnEnable()
@@ -44,6 +47,8 @@ namespace Script.Player.LobbyPlayer.View
             {
                 return;
             }
+
+            _lobbyServerController.RpcLobbyPlayerReady(this);
             
             _signalBus.Fire(new LobbyPlayerReady() { LobbyPlayer = this });
         }
