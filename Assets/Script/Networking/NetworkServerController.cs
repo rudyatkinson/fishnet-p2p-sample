@@ -1,18 +1,20 @@
 ﻿using System;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
+using FishNet.Transporting;
 using FishNet.Transporting.Tugboat;
 using UnityEngine;
 using Zenject;
 
 namespace Script.Networking
 {
-    public class NetworkController: IDisposable
+    public class NetworkServerController: IDisposable
     {
         private readonly SignalBus _signalBus;
         private readonly NetworkManager _networkManager;
         private readonly Tugboat _tugboat;
 
-        public NetworkController(SignalBus signalBus, 
+        public NetworkServerController(SignalBus signalBus, 
             NetworkManager networkManager,
             Tugboat tugboat)
         {
@@ -28,17 +30,33 @@ namespace Script.Networking
         {
             _signalBus.Unsubscribe<HostButtonClickedSignal>(OnHostButtonClicked);
             _signalBus.Unsubscribe<JoinButtonClickedSignal>(OnJoinButtonClicked);
+            
+            _networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionStateChanged;
         }
 
         private void OnHostButtonClicked()
         {
             _tugboat.StartConnection(true);
             _tugboat.StartConnection(false);
+            
+            _networkManager.ServerManager.OnServerConnectionState += OnServerConnectionStateChanged;
         }
 
         private void OnJoinButtonClicked()
         {
             _tugboat.StartConnection(false);
+        }
+
+        private void OnServerConnectionStateChanged(ServerConnectionStateArgs args)
+        {
+            if (args.ConnectionState == LocalConnectionState.Started)
+            {
+                _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData());
+                _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "LobbyScene")
+                {
+                    ReplaceScenes = ReplaceOption.All
+                });
+            }
         }
     }
 }

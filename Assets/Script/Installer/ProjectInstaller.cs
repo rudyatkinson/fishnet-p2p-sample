@@ -21,7 +21,7 @@ namespace Script.Installer
             Container.Bind<NetworkManager>().FromInstance(_networkManager).AsSingle().NonLazy();
             Container.Bind<Tugboat>().FromInstance(_tugboat).AsSingle().NonLazy();
         
-            Container.BindInterfacesTo<NetworkController>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<NetworkServerController>().AsSingle().NonLazy();
         }
     }
 }
