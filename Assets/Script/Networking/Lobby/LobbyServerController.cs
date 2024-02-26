@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using FishNet.Connection;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Object;
+using R3;
+using Script.Networking.Lobby.View;
 using Script.Player.LobbyPlayer.View;
-using UnityEngine;
 using Zenject;
 
 namespace Script.Networking.Lobby
@@ -12,15 +16,19 @@ namespace Script.Networking.Lobby
     public class LobbyServerController: NetworkBehaviour
     {
         private NetworkManager _networkManager;
+        private LobbyView _lobbyView;
 
         private List<LobbyPlayerView> _lobbyPlayers = new();
-        private int readyPlayerCount = 0;
-        
+        private int readyPlayerCount;
+
+        private CancellationTokenSource _startCountdownIntervalToken;
+
         [Inject]
-        public void Construct(NetworkManager networkManager)
+        public void Construct(NetworkManager networkManager,
+            LobbyView lobbyView)
         {
             _networkManager = networkManager;
-            
+            _lobbyView = lobbyView;
         }
 
         public void AddLobbyPlayer(LobbyPlayerView lobbyPlayerView)
@@ -44,15 +52,49 @@ namespace Script.Networking.Lobby
             
             var totalPlayerCount = _lobbyPlayers.Count;
 
-            Debug.Log($"[RpcLobbyPlayerReady] totalPlayerCount: {totalPlayerCount}, readyPlayerCount: {readyPlayerCount}");
+            if (readyPlayerCount < totalPlayerCount)
+            {
+                _startCountdownIntervalToken?.Cancel();
+                
+                RpcDisableLobbyStartCountdown();
+                
+                return;
+            }
 
-            RpcLobbyPlayerReadyConfirmation(totalPlayerCount == readyPlayerCount);
+            _startCountdownIntervalToken = new CancellationTokenSource();
+            var countdown = 5;
+            
+            Observable.Interval(TimeSpan.FromSeconds(1), _startCountdownIntervalToken.Token)
+                .TakeWhile(_ => countdown >= 0)
+                .Subscribe(_ =>
+                {
+                    if (countdown <= 0)
+                    {
+                        RpcLoadPlayScene();
+                    }
+                    
+                    RpcLobbyStartCountdownNotifier(countdown--);
+                });
+
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RpcLoadPlayScene()
+        {
+            _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: "LobbyScene"));
+            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "PlayScene"));
         }
 
         [ObserversRpc]
-        private void RpcLobbyPlayerReadyConfirmation(bool allPlayersReady)
+        private void RpcLobbyStartCountdownNotifier(int countDown)
         {
-            Debug.Log($"All players are ready: {allPlayersReady}");
+            _lobbyView.RefreshLobbyStartCountdown(countDown);
+        }
+
+        [ObserversRpc] 
+        private void RpcDisableLobbyStartCountdown()
+        {
+            _lobbyView.DisableLobbyStartCountdown();
         }
     }
 }
