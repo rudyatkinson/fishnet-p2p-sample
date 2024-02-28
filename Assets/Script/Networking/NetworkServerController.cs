@@ -3,8 +3,10 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using FishNet.Transporting.Tugboat;
+using FishNet.Utility.Extension;
 using Script.Networking.Signal;
 using Zenject;
+using Scenes = Script.Networking.Lobby.Model.Scenes;
 
 namespace Script.Networking
 {
@@ -49,13 +51,20 @@ namespace Script.Networking
 
         private void OnServerConnectionStateChanged(ServerConnectionStateArgs args)
         {
-            if (args.ConnectionState == LocalConnectionState.Started)
+            switch (args.ConnectionState)
             {
-                _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData());
-                _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "LobbyScene")
-                {
-                    ReplaceScenes = ReplaceOption.All
-                });
+                case LocalConnectionState.Started:
+                    
+                    _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData());
+                    _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: Scenes.LobbyScene.ToString()){ ReplaceScenes = ReplaceOption.All});
+                    
+                    break;
+                case LocalConnectionState.Stopped:
+                    
+                    _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData());
+                    _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: Scenes.OfflineScene.ToString()));
+
+                    break;
             }
         }
     }

@@ -6,6 +6,7 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
 using R3;
+using Script.Networking.Lobby.Model;
 using Script.Networking.Lobby.View;
 using Script.Player.LobbyPlayer.View;
 using Zenject;
@@ -81,8 +82,8 @@ namespace Script.Networking.Lobby
         [ServerRpc(RequireOwnership = false)]
         private void RpcLoadPlayScene()
         {
-            _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: "LobbyScene"));
-            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "PlayScene"));
+            _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: Scenes.LobbyScene.ToString()));
+            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: Scenes.PlayScene.ToString()));
         }
 
         [ObserversRpc]
