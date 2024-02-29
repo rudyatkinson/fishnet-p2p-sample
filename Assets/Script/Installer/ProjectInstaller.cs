@@ -2,7 +2,6 @@ using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using Script.Networking;
 using Script.Networking.Signal;
-using Script.Player.LobbyPlayer.Signal;
 using UnityEngine;
 using Zenject;
 
@@ -19,7 +18,6 @@ namespace Script.Installer
 
             Container.DeclareSignal<HostButtonClickedSignal>();
             Container.DeclareSignal<JoinButtonClickedSignal>();
-            Container.DeclareSignal<LobbyPlayerReady>();
             
             Container.Bind<NetworkManager>().FromInstance(_networkManager).AsSingle().NonLazy();
             Container.Bind<Tugboat>().FromInstance(_tugboat).AsSingle().NonLazy();

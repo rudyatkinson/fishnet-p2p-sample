@@ -27,20 +27,23 @@ namespace Script.Player.LobbyPlayer.Network
             _networkManager = InstanceFinder.NetworkManager;
         }
 
-        private void OnEnable()
+        private void Start()
         {
             _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScene;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScene;
         }
 
+        [Server]
         private void OnClientLoadedStartScene(NetworkConnection conn, bool isServer)
         {
             if (!isServer)
+            {
                 return;
+            }
             
             if (_lobbyPlayerPrefab == null)
             {

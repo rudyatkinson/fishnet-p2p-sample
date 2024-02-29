@@ -329,8 +329,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -445,6 +445,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 31709733782417099}
   _networkObjectCache: {fileID: 31709733782417099}
   _name: {fileID: 78268010022628798}
+  _readyButtonText: {fileID: 1721311192673689915}
   _readyButton: {fileID: 2128089866715506990}
 --- !u!114 &31709733782417099
 MonoBehaviour:
@@ -466,7 +467,7 @@ MonoBehaviour:
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
-    Position: {x: -372.5, y: -209.5, z: 0}
+    Position: {x: -496.5, y: -279.5, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     LocalScale: {x: 1, y: 1, z: 1}
   _isNetworked: 1

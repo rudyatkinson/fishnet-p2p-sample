@@ -38,7 +38,7 @@ namespace Script.Networking.Lobby
         }
         
         [ServerRpc(RequireOwnership = false)]
-        public void RpcLobbyPlayerReady(LobbyPlayerView lobbyPlayer, NetworkConnection conn = null)
+        public void CmdLobbyPlayerReady(LobbyPlayerView lobbyPlayer, NetworkConnection conn = null)
         {
             lobbyPlayer.IsReady.Value = !lobbyPlayer.IsReady.Value;
 

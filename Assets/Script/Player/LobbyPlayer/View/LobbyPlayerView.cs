@@ -1,7 +1,7 @@
-﻿using FishNet.Object;
+﻿using FishNet.Connection;
+using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using Script.Networking.Lobby;
-using Script.Player.LobbyPlayer.Signal;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +15,7 @@ namespace Script.Player.LobbyPlayer.View
         private LobbyServerController _lobbyServerController;
         
         [SerializeField] private TMP_Text _name;
+        [SerializeField] private TMP_Text _readyButtonText;
         [SerializeField] private Button _readyButton;
 
         public readonly SyncVar<bool> IsReady = new(false, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
@@ -26,7 +27,14 @@ namespace Script.Player.LobbyPlayer.View
             _signalBus = signalBus;
             _lobbyServerController = lobbyServerController;
         }
-        
+
+        public override void OnOwnershipClient(NetworkConnection prevOwner)
+        {
+            _readyButton.image.color = IsOwner ? Color.white : Color.clear;
+
+            base.OnOwnershipClient(prevOwner);
+        }
+
         private void OnEnable()
         {
             _readyButton.onClick.AddListener(ReadyButtonClicked);
@@ -48,14 +56,12 @@ namespace Script.Player.LobbyPlayer.View
                 return;
             }
 
-            _lobbyServerController.RpcLobbyPlayerReady(this);
-            
-            _signalBus.Fire(new LobbyPlayerReady() { LobbyPlayer = this });
+            _lobbyServerController.CmdLobbyPlayerReady(this);
         }
         
         private void OnIsReadyChange(bool old, bool current, bool asServer)
         {
-            _readyButton.image.color = current ? Color.green : Color.white;
+            _readyButtonText.color = current ? Color.green : Color.red;
         }
     }
 }
