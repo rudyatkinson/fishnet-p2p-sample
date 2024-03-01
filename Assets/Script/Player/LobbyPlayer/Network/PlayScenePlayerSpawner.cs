@@ -1,4 +1,4 @@
-﻿using FishNet.Connection;
+﻿using System;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
@@ -19,23 +19,17 @@ namespace Script.Player.LobbyPlayer.Network
         [Inject]
         private void Construct(NetworkManager networkManager)
         {
-            Debug.Log($"[PlayScenePlayerSpawner] Construct");
             _networkManager = networkManager;
-            
-            _networkManager.SceneManager.OnLoadEnd += OnLoadEnd;
         }
-        
-        private void OnDestroy()
+
+        private void Start()
         {
-            Debug.Log($"[PlayScenePlayerSpawner] OnDestroy");
-            _networkManager.SceneManager.OnLoadEnd -= OnLoadEnd;
+            InstantiatePlayerObjects();
         }
         
         [Server]
-        private void OnLoadEnd(SceneLoadEndEventArgs e)
+        private void InstantiatePlayerObjects()
         {
-            Debug.Log($"[PlayScenePlayerSpawner] OnClientLoadedStartScene");
-
             if (_playerPrefab == null)
             {
                 Debug.LogWarning($"Lobby player prefab is empty and cannot be spawned for connection.");

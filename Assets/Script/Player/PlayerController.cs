@@ -1,25 +1,17 @@
-﻿using FishNet.Connection;
+﻿using System.Runtime.CompilerServices;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Script.Player
 {
     public class PlayerController: NetworkBehaviour
     {
+        [SerializeField] private PlayerInput _playerInput;
+        
         private readonly SyncVar<int> _health = new(initialValue: 100, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
-
-        public override void OnStartClient()
-        {
-            Debug.Log("OnStartClient");
-            base.OnStartClient();
-        }
-
-        public override void OnStartServer()
-        {
-            Debug.Log("OnStartServer");
-            base.OnStartServer();
-        }
 
         private void OnEnable()
         {
@@ -30,7 +22,7 @@ namespace Script.Player
         {
             _health.OnChange -= OnHealthChanged;
         }
-
+        
         private void Update()
         {
             if (!IsOwner)
