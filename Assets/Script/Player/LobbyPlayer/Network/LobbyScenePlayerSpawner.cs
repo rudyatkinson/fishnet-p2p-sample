@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Script.Player.LobbyPlayer.Network
 {
-    public class LobbyPlayerSpawner: MonoBehaviour
+    public class LobbyScenePlayerSpawner: MonoBehaviour
     {
         private NetworkManager _networkManager;
         private LobbyServerController _lobbyServerController;
@@ -17,27 +17,21 @@ namespace Script.Player.LobbyPlayer.Network
         [SerializeField] private NetworkObject _lobbyPlayerPrefab;
 
         [Inject]
-        private void Construct(LobbyServerController lobbyServerController)
+        private void Construct(NetworkManager networkManager,
+            LobbyServerController lobbyServerController)
         {
             _lobbyServerController = lobbyServerController;
-        }
-        
-        private void Awake()
-        {
+            
             _networkManager = InstanceFinder.NetworkManager;
-        }
-
-        private void Start()
-        {
+            
             _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScene;
         }
-
+        
         private void OnDestroy()
         {
             _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScene;
         }
-
-        [Server]
+        
         private void OnClientLoadedStartScene(NetworkConnection conn, bool isServer)
         {
             if (!isServer)

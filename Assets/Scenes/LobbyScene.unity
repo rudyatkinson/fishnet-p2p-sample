@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lobbyServerController: {fileID: 1953358620}
-  _lobbyPlayerSpawner: {fileID: 1673500890}
+  lobbyScenePlayerSpawner: {fileID: 1673500890}
   _lobbyView: {fileID: 573527711}
 --- !u!114 &444520938
 MonoBehaviour:
