@@ -514,9 +514,9 @@ MonoBehaviour:
   <NestedRootNetworkBehaviours>k__BackingField:
   - {fileID: 1673500892}
   SerializedTransformProperties:
-    Position: {x: 497, y: 279.5, z: 0}
+    Position: {x: 381.5, y: 214.5, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
-    LocalScale: {x: 0.51770836, y: 0.51770836, z: 0.51770836}
+    LocalScale: {x: 0.39739582, y: 0.39739582, z: 0.39739582}
   _isNetworked: 1
   _isSpawnable: 1
   _isGlobal: 0
@@ -773,7 +773,7 @@ MonoBehaviour:
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 1505568122}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
-    Position: {x: 0, y: 414.87927, z: 0}
+    Position: {x: 0, y: 414.7641, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     LocalScale: {x: 1, y: 1, z: 1}
   _isNetworked: 1

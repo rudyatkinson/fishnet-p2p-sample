@@ -11,7 +11,6 @@ namespace Script.Player.LobbyPlayer.View
 {
     public class LobbyPlayerView: NetworkBehaviour
     {
-        private SignalBus _signalBus;
         private LobbyServerController _lobbyServerController;
         
         [SerializeField] private TMP_Text _name;
@@ -21,10 +20,8 @@ namespace Script.Player.LobbyPlayer.View
         public readonly SyncVar<bool> IsReady = new(false, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
 
         [Inject]
-        private void Construct(SignalBus signalBus,
-            LobbyServerController lobbyServerController)
+        private void Construct(LobbyServerController lobbyServerController)
         {
-            _signalBus = signalBus;
             _lobbyServerController = lobbyServerController;
         }
 

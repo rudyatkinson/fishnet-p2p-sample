@@ -24,15 +24,16 @@ namespace Script.Player.LobbyPlayer.Network
             
             _networkManager = InstanceFinder.NetworkManager;
             
-            _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScene;
+            _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientConnected;
         }
         
         private void OnDestroy()
         {
-            _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScene;
+            _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientConnected;
         }
         
-        private void OnClientLoadedStartScene(NetworkConnection conn, bool isServer)
+        [Server]
+        private void OnClientConnected(NetworkConnection conn, bool isServer)
         {
             if (!isServer)
             {
