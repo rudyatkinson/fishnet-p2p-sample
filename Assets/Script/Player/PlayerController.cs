@@ -1,7 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using Script.Installer;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,20 +10,40 @@ namespace Script.Player
 {
     public class PlayerController: NetworkBehaviour
     {
-        [SerializeField] private PlayerInput _playerInput;
+        private PlayerInput _playerInput;
         
         private readonly SyncVar<int> _health = new(initialValue: 100, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
 
-        private void OnEnable()
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+
+            if (!IsOwner)
+            {
+                return;
+            }
+            
+            Inject();
+            Subscribe();
+        }
+
+        // TODO: This injection method should be applied into both lobby player and player classes.
+        private void Inject()
+        {
+            // TODO: Injection does not work on client side as it should be.
+            _playerInput = PlaySceneInstaller.ContainerInstance.Resolve<PlayerInput>();
+        }
+        
+        private void Subscribe()
         {
             _health.OnChange += OnHealthChanged;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             _health.OnChange -= OnHealthChanged;
         }
-        
+
         private void Update()
         {
             if (!IsOwner)
@@ -30,10 +51,10 @@ namespace Script.Player
                 return;
             }
             
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-               Hit();
-            }
+            var moveValue = _playerInput.actions["Move"].ReadValue<Vector2>();
+            
+            // TODO: Movement speed must be configurized and authorized to server.
+            transform.position += new Vector3(moveValue.x, moveValue.y, 0) * Time.deltaTime * 2f;
         }
 
         [Server]
