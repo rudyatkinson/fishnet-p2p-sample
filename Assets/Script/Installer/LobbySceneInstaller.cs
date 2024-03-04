@@ -9,10 +9,17 @@ namespace Script.Installer
 {
     public class LobbySceneInstaller: MonoInstaller
     {
+        public static DiContainer ContainerInstance;
+
         [SerializeField] private LobbyServerController _lobbyServerController;
         [SerializeField] private LobbyScenePlayerSpawner lobbyScenePlayerSpawner;
         [SerializeField] private LobbyView _lobbyView;
     
+        private void Awake()
+        {
+            ContainerInstance = Container;
+        }
+        
         public override void InstallBindings()
         {
             Container.Bind<LobbyServerController>().FromInstance(_lobbyServerController).AsSingle().NonLazy();

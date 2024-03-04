@@ -1,6 +1,7 @@
 ﻿using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using Script.Installer;
 using Script.Networking.Lobby;
 using TMPro;
 using UnityEngine;
@@ -19,27 +20,41 @@ namespace Script.Player.LobbyPlayer.View
 
         public readonly SyncVar<bool> IsReady = new(false, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
 
-        [Inject]
-        private void Construct(LobbyServerController lobbyServerController)
+        public override void OnStartClient()
         {
-            _lobbyServerController = lobbyServerController;
+            Inject();
+            Subscribe();
+            SetOwnership();
+
+            if (!IsOwner)
+            {
+                return;
+            }
+            
+            SubscribeAsOwner();
         }
 
-        public override void OnOwnershipClient(NetworkConnection prevOwner)
+        private void Inject()
+        {
+            _lobbyServerController = LobbySceneInstaller.ContainerInstance.Resolve<LobbyServerController>();
+        }
+
+        private void SetOwnership()
         {
             _readyButton.image.color = IsOwner ? Color.white : Color.clear;
-
-            base.OnOwnershipClient(prevOwner);
         }
 
-        private void OnEnable()
+        private void Subscribe()
         {
-            _readyButton.onClick.AddListener(ReadyButtonClicked);
-
             IsReady.OnChange += OnIsReadyChange;
         }
+        
+        private void SubscribeAsOwner()
+        {
+            _readyButton.onClick.AddListener(ReadyButtonClicked);
+        }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             _readyButton.onClick.RemoveListener(ReadyButtonClicked);
             

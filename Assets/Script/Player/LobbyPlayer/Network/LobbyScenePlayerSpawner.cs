@@ -2,6 +2,7 @@
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Object;
+using Script.Installer;
 using Script.Networking.Lobby;
 using Script.Player.LobbyPlayer.View;
 using UnityEngine;
@@ -16,23 +17,29 @@ namespace Script.Player.LobbyPlayer.Network
         
         [SerializeField] private NetworkObject _lobbyPlayerPrefab;
 
-        [Inject]
-        private void Construct(NetworkManager networkManager,
-            LobbyServerController lobbyServerController)
+        [Server]
+        public void Start()
         {
-            _lobbyServerController = lobbyServerController;
-            
-            _networkManager = InstanceFinder.NetworkManager;
-            
+            Inject();
+            Subscribe();
+        }
+
+        private void Inject()
+        {
+            _lobbyServerController = LobbySceneInstaller.ContainerInstance.Resolve<LobbyServerController>();
+            _networkManager = LobbySceneInstaller.ContainerInstance.Resolve<NetworkManager>();
+        }
+
+        private void Subscribe()
+        {
             _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientConnected;
         }
-        
+
         private void OnDestroy()
         {
             _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientConnected;
         }
         
-        [Server]
         private void OnClientConnected(NetworkConnection conn, bool isServer)
         {
             if (!isServer)
