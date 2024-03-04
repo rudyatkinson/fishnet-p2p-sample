@@ -83,7 +83,10 @@ namespace Script.Networking.Lobby
         private void RpcLoadPlayScene()
         {
             _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: Scenes.LobbyScene.ToString()));
-            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: Scenes.PlayScene.ToString()));
+            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: Scenes.PlayScene.ToString())
+            {
+                PreferredActiveScene = new PreferredScene(new SceneLookupData(name:Scenes.PlayScene.ToString()))
+            });
         }
 
         [ObserversRpc]

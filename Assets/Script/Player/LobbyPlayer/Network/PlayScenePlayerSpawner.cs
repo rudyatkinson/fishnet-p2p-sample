@@ -2,6 +2,7 @@
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
+using Script.Installer;
 using UnityEngine;
 using Zenject;
 
@@ -15,19 +16,19 @@ namespace Script.Player.LobbyPlayer.Network
 
         [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private Transform[] _playerSpawnTransforms;
-        
-        [Inject]
-        private void Construct(NetworkManager networkManager)
-        {
-            _networkManager = networkManager;
-        }
 
-        private void Start()
+        [Server]
+        public void Start()
         {
+            Inject();
             InstantiatePlayerObjects();
         }
-        
-        [Server]
+
+        private void Inject()
+        {
+            _networkManager = LobbySceneInstaller.ContainerInstance.Resolve<NetworkManager>();
+        }
+
         private void InstantiatePlayerObjects()
         {
             if (_playerPrefab == null)
@@ -38,12 +39,12 @@ namespace Script.Player.LobbyPlayer.Network
 
             foreach (var serverManagerClient in _networkManager.ServerManager.Clients)
             {
-                var obj = _networkManager.GetPooledInstantiated(_playerPrefab, true);
+                var obj = Instantiate(_playerPrefab);
                 var spawnTransform = _playerSpawnTransforms[_nextSpawnIndex++];
 
                 obj.transform.position = spawnTransform.position;
             
-                _networkManager.ServerManager.Spawn(obj, serverManagerClient.Value);
+                _networkManager.ServerManager.Spawn(obj, serverManagerClient.Value, UnityEngine.SceneManagement.SceneManager.GetSceneByName("PlayScene"));
             
                 if (_nextSpawnIndex >= _playerSpawnTransforms.Length)
                 {

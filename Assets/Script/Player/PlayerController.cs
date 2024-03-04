@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
@@ -13,13 +15,21 @@ namespace Script.Player
         private PlayerInput _playerInput;
         
         private readonly SyncVar<int> _health = new(initialValue: 100, new SyncTypeSettings(writePermissions: WritePermission.ServerOnly, readPermissions: ReadPermission.Observers));
-
+        
         public override void OnStartClient()
         {
-            base.OnStartClient();
-
-            if (!IsOwner)
+            if (!IsHostInitialized && IsClientInitialized)
             {
+                InstanceFinder.SceneManager.OnLoadEnd += args =>
+                {
+                    if (!args.LoadedScenes.Any(scene => scene.name == "PlayScene"))
+                    {
+                        return;
+                    }
+                    
+                    Inject();
+                    Subscribe();
+                };
                 return;
             }
             
@@ -30,7 +40,6 @@ namespace Script.Player
         // TODO: This injection method should be applied into both lobby player and player classes.
         private void Inject()
         {
-            // TODO: Injection does not work on client side as it should be.
             _playerInput = PlaySceneInstaller.ContainerInstance.Resolve<PlayerInput>();
         }
         

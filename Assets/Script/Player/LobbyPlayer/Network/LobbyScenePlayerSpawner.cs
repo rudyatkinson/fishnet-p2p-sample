@@ -18,7 +18,7 @@ namespace Script.Player.LobbyPlayer.Network
         [SerializeField] private NetworkObject _lobbyPlayerPrefab;
 
         [Server]
-        public void Start()
+        public void Awake()
         {
             Inject();
             Subscribe();

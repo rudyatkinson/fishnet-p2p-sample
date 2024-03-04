@@ -9,6 +9,8 @@ namespace Script.Installer
     public class PlaySceneInstaller: MonoInstaller
     {
         public static DiContainer ContainerInstance;
+
+        public static event Action InstallComplete;
         
         [SerializeField] private PlayerInput _playerInput;
         [SerializeField] private PlayScenePlayerSpawner _playerSpawner;
@@ -22,6 +24,8 @@ namespace Script.Installer
         {
             Container.Bind<PlayerInput>().FromInstance(_playerInput).AsSingle().NonLazy();
             Container.Bind<PlayScenePlayerSpawner>().FromInstance(_playerSpawner).AsSingle().NonLazy();
+            
+            InstallComplete?.Invoke();
         }
     }
 }
