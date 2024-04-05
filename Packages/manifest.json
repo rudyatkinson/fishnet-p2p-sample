@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.firstgeargames.fishnet": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
+    "com.playeveryware.eos": "git@github.com:PlayEveryWare/eos_plugin_for_unity_upm.git",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.feature.2d": "2.0.0",
     "com.unity.ide.rider": "3.0.27",
