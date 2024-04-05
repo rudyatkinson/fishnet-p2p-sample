@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.etdofresh.fishyeos": "https://github.com/ETdoFresh/FishyEOS.git?path=/FishNet/Plugins/FishyEOS",
     "com.firstgeargames.fishnet": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
     "com.playeveryware.eos": "git@github.com:PlayEveryWare/eos_plugin_for_unity_upm.git",
     "com.unity.collab-proxy": "2.3.1",
