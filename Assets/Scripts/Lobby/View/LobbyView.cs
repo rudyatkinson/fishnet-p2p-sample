@@ -29,21 +29,23 @@ namespace RudyAtkinson.Lobby.View
                 return;
             }
             
-            if (GUILayout.Button("HOST", GUILayout.Width(450), GUILayout.Height(150)))
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - 375, Screen.height / 2 - 75, 750, 150));
+            if (GUILayout.Button("HOST", new GUIStyle("button"){fontSize = 42},GUILayout.Width(750), GUILayout.Height(75)))
             {
                 HostButtonClick?.Invoke();
             }
 
-            GUILayout.BeginHorizontal(GUILayout.Width(450), GUILayout.Height(150));
+            GUILayout.BeginHorizontal();
             
-            _lobbyRepository.Address = GUILayout.TextField(_lobbyRepository.Address);
+            _lobbyRepository.Address = GUILayout.TextField(_lobbyRepository.Address, new GUIStyle("textfield"){fontSize = 42}, GUILayout.Width(550), GUILayout.Height(75));
 
-            if (GUILayout.Button("JOIN"))
+            if (GUILayout.Button("JOIN", new GUIStyle("button"){fontSize = 42}, GUILayout.Width(200), GUILayout.Height(75)))
             {
                 JoinButtonClick?.Invoke();
             }
             
             GUILayout.EndHorizontal();
+            GUILayout.EndArea();
         }
     }
 }
