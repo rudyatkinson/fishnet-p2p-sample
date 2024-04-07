@@ -7,20 +7,16 @@ namespace RudyAtkinson.LobbyPlayer.View
     public class LobbyPlayerViewFactory
     {
         private LobbyPlayerView _prefab;
-        private LobbyRepository _lobbyRepository;
         
         [Inject]
-        public LobbyPlayerViewFactory(LobbyPlayerView prefab, 
-            LobbyRepository lobbyRepository)
+        public LobbyPlayerViewFactory(LobbyPlayerView prefab)
         {
             _prefab = prefab;
-            _lobbyRepository = lobbyRepository;
         }
 
         public LobbyPlayerView Create()
         {
             var obj = Object.Instantiate(_prefab, null, true);
-            obj.SetDependencies(_lobbyRepository);
             
             return obj;
         }

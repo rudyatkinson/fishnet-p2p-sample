@@ -17,13 +17,6 @@ namespace RudyAtkinson.LobbyPlayer.View
         [SerializeField] private Toggle _readyToggle;
         [SerializeField] private Button _readyButton;
 
-        private LobbyRepository _lobbyRepository;
-
-        public void SetDependencies(LobbyRepository lobbyRepository)
-        {
-            _lobbyRepository = lobbyRepository;
-        }
-
         #region Client
 
         public override void OnStartClient()
@@ -44,8 +37,6 @@ namespace RudyAtkinson.LobbyPlayer.View
 
             if (IsOwner)
             {
-                ServerRPCSetName(_lobbyRepository.PlayerName);
-                
                 _readyButton.onClick.AddListener(OnReadyButtonClick);
             }
             else
@@ -79,7 +70,7 @@ namespace RudyAtkinson.LobbyPlayer.View
         #region Server
 
         [ServerRpc(RequireOwnership = true)]
-        private void ServerRPCSetName(string playerName)
+        public void ServerRPCSetName(string playerName)
         {
             _name.Value = playerName;
         }

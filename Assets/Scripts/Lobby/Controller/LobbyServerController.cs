@@ -3,6 +3,7 @@ using FishNet.Managing;
 using FishNet.Object;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
+using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.LobbyPlayer.View;
 using UnityEngine;
 using VContainer;
@@ -14,6 +15,7 @@ namespace RudyAtkinson.Lobby.Controller
         private NetworkManager _networkManager;
         private FishyEOS _fishyEos;
         private LobbyPlayerViewFactory _lobbyPlayerViewFactory;
+        private LobbyRepository _lobbyRepository;
 
         [SerializeField] private LobbyPlayerView _lobbyPlayerView;
         [SerializeField] private Transform _lobbyPlayerParent;
@@ -21,11 +23,13 @@ namespace RudyAtkinson.Lobby.Controller
         [Inject]
         private void Construct(NetworkManager networkManager,
             FishyEOS fishyEos,
-            LobbyPlayerViewFactory lobbyPlayerViewFactory)
+            LobbyPlayerViewFactory lobbyPlayerViewFactory,
+            LobbyRepository lobbyRepository)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
             _lobbyPlayerViewFactory = lobbyPlayerViewFactory;
+            _lobbyRepository = lobbyRepository;
         }
         
         public void OnEnable()
@@ -33,6 +37,7 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.ServerManager.OnServerConnectionState += OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += OnClientStateChanged;
+            _networkManager.ClientManager.Connection.OnObjectAdded += OnConnectionObjectAdded;
         }
         
         public void OnDisable()
@@ -40,7 +45,29 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.ServerManager.OnServerConnectionState -= OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState -= OnClientStateChanged;
+            _networkManager.ClientManager.Connection.OnObjectAdded -= OnConnectionObjectAdded;
         }
+
+        #region Client Callbacks
+        
+        private void OnClientStateChanged(ClientConnectionStateArgs args)
+        {
+            Debug.Log($"[Client] Connection state: {args.ConnectionState}");
+        }
+        
+        private void OnConnectionObjectAdded(NetworkObject obj)
+        {
+            var lobbyPlayerViewValid = obj.TryGetComponent<LobbyPlayerView>(out var lobbyPlayerView);
+
+            if (lobbyPlayerViewValid)
+            {
+                lobbyPlayerView.ServerRPCSetName(_lobbyRepository.PlayerName);
+            }
+        }
+        
+        #endregion
+        
+        #region Server Callbacks
         
         private void OnServerStateChanged(ServerConnectionStateArgs args)
         {
@@ -69,12 +96,8 @@ namespace RudyAtkinson.Lobby.Controller
                 var lobbyPlayer = connection.FirstObject.GetComponent<LobbyPlayerView>();
                 _networkManager.ServerManager.Despawn(lobbyPlayer.gameObject, DespawnType.Destroy);
             }
-            
         }
-    
-        private void OnClientStateChanged(ClientConnectionStateArgs args)
-        {
-            Debug.Log($"[Client] Connection state: {args.ConnectionState}");
-        }
+        
+        #endregion
     }
 }
