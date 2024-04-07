@@ -37,6 +37,8 @@ namespace RudyAtkinson.LobbyPlayer.View
 
             if (IsOwner)
             {
+                ServerRPCSetName(PlayerPrefs.GetString("rudyatkinson-player-name"));
+                
                 _readyButton.onClick.AddListener(OnReadyButtonClick);
             }
             else
@@ -66,11 +68,11 @@ namespace RudyAtkinson.LobbyPlayer.View
         }
 
         #endregion
-
+        
         #region Server
 
         [ServerRpc(RequireOwnership = true)]
-        public void ServerRPCSetName(string playerName)
+        private void ServerRPCSetName(string playerName)
         {
             _name.Value = playerName;
         }

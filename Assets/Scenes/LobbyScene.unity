@@ -322,8 +322,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 818385699}
   _networkObjectCache: {fileID: 818385699}
-  _lobbyPlayerView: {fileID: -5220558957563609480, guid: f74811d8a631a9d478d31c89f80f0945, type: 3}
-  _lobbyPlayerParent: {fileID: 1510357129}
+  _lobbyPlayerParent: {fileID: 1510357131}
 --- !u!114 &818385699
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,6 +25,11 @@ namespace RudyAtkinson.Lobby.View
             _lobbyRepository = lobbyRepository;
         }
 
+        private void Awake()
+        {
+            PlayerPrefs.SetString("rudyatkinson-player-name", "Player");
+        }
+
         private void OnGUI()
         {
             if (_networkManager.IsClientStarted)
@@ -34,7 +39,7 @@ namespace RudyAtkinson.Lobby.View
             
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - _height * .5f, _width, _height));
             
-            var playerName = GUILayout.TextField(_lobbyRepository.PlayerName, new GUIStyle("textfield"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75))
+            var playerName = GUILayout.TextField(PlayerPrefs.GetString("rudyatkinson-player-name"), new GUIStyle("textfield"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75))
                 .Trim()
                 .Replace(" ", string.Empty);
 
@@ -43,7 +48,7 @@ namespace RudyAtkinson.Lobby.View
                 playerName = playerName[..18];
             }
 
-            _lobbyRepository.PlayerName = playerName;
+            PlayerPrefs.SetString("rudyatkinson-player-name", playerName);
 
             if (GUILayout.Button("HOST", new GUIStyle("button"){fontSize = 42},GUILayout.Width(750), GUILayout.Height(75)))
             {
