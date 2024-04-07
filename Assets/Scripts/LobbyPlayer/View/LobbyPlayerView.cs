@@ -1,7 +1,8 @@
-using System;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RudyAtkinson.Lobby.Repository;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,18 +10,31 @@ namespace RudyAtkinson.LobbyPlayer.View
 {
     public class LobbyPlayerView : NetworkBehaviour
     {
+        private readonly SyncVar<string> _name = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         private readonly SyncVar<bool> _ready = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
-        
+
+        [SerializeField] private TMP_Text _playerNameText;
         [SerializeField] private Toggle _readyToggle;
         [SerializeField] private Button _readyButton;
 
+        private LobbyRepository _lobbyRepository;
+
+        public void SetDependencies(LobbyRepository lobbyRepository)
+        {
+            _lobbyRepository = lobbyRepository;
+        }
+
+        #region Client
+
         public override void OnStartClient()
         {
+            _name.OnChange += OnNameChange;
             _ready.OnChange += OnReadyChange;
         }
 
         public override void OnStopClient()
         {
+            _name.OnChange -= OnNameChange;
             _ready.OnChange -= OnReadyChange;
         }
 
@@ -30,6 +44,8 @@ namespace RudyAtkinson.LobbyPlayer.View
 
             if (IsOwner)
             {
+                ServerRPCSetName(_lobbyRepository.PlayerName);
+                
                 _readyButton.onClick.AddListener(OnReadyButtonClick);
             }
             else
@@ -43,9 +59,29 @@ namespace RudyAtkinson.LobbyPlayer.View
             ServerRPCPlayerReady();
         }
 
-        public void SetActiveReadyButton(bool isActive)
+        private void SetActiveReadyButton(bool isActive)
         {
             _readyButton.gameObject.SetActive(isActive);
+        }
+        
+        private void OnNameChange(string prev, string next, bool asServer)
+        {
+            _playerNameText.SetText(next);
+        }
+        
+        private void OnReadyChange(bool prev, bool next, bool asServer)
+        {
+            _readyToggle.isOn = next;
+        }
+
+        #endregion
+
+        #region Server
+
+        [ServerRpc(RequireOwnership = true)]
+        private void ServerRPCSetName(string playerName)
+        {
+            _name.Value = playerName;
         }
         
         [ServerRpc(RequireOwnership = true)]
@@ -60,16 +96,7 @@ namespace RudyAtkinson.LobbyPlayer.View
             _ready.Value = !_ready.Value;
             _readyToggle.isOn = _ready.Value;
         }
-        
-        [ObserversRpc]
-        private void OnReadyChange(bool prev, bool next, bool asServer)
-        {
-            if (!asServer)
-            {
-                return;
-            }
 
-            _readyToggle.isOn = next;
-        }
+        #endregion
     }
 }

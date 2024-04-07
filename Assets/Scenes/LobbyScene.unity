@@ -247,11 +247,13 @@ MonoBehaviour:
   parentReference:
     TypeName: 
   autoRun: 1
-  autoInjectGameObjects: []
+  autoInjectGameObjects:
+  - {fileID: 8482748267403664213, guid: f74811d8a631a9d478d31c89f80f0945, type: 3}
   _networkManager: {fileID: 1238716818}
   _fishyEos: {fileID: 1238716816}
   _lobbyView: {fileID: 1687387899}
   _lobbyServerController: {fileID: 818385698}
+  _lobbyPlayerView: {fileID: -5220558957563609480, guid: f74811d8a631a9d478d31c89f80f0945, type: 3}
 --- !u!4 &779863846
 Transform:
   m_ObjectHideFlags: 0
@@ -339,9 +341,9 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 818385698}
+  - {fileID: 1510357131}
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
-  <NestedRootNetworkBehaviours>k__BackingField:
-  - {fileID: 0}
+  <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -454,9 +456,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a6a39c46bf52104ba8efe3100bce3f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 0
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 818385699}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 818385699}
 --- !u!1 &1513584324
 GameObject:
   m_ObjectHideFlags: 0

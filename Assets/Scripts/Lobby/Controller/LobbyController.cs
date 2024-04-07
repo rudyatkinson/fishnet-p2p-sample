@@ -1,11 +1,8 @@
 ﻿using System;
-using FishNet.Connection;
 using FishNet.Managing;
-using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
-using UnityEngine;
 using VContainer.Unity;
 
 namespace RudyAtkinson.Lobby.Controller

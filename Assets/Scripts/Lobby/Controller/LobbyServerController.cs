@@ -3,7 +3,6 @@ using FishNet.Managing;
 using FishNet.Object;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
-using RudyAtkinson.Lobby.View;
 using RudyAtkinson.LobbyPlayer.View;
 using UnityEngine;
 using VContainer;
@@ -14,16 +13,19 @@ namespace RudyAtkinson.Lobby.Controller
     {
         private NetworkManager _networkManager;
         private FishyEOS _fishyEos;
+        private LobbyPlayerViewFactory _lobbyPlayerViewFactory;
 
         [SerializeField] private LobbyPlayerView _lobbyPlayerView;
         [SerializeField] private Transform _lobbyPlayerParent;
         
         [Inject]
         private void Construct(NetworkManager networkManager,
-            FishyEOS fishyEos)
+            FishyEOS fishyEos,
+            LobbyPlayerViewFactory lobbyPlayerViewFactory)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
+            _lobbyPlayerViewFactory = lobbyPlayerViewFactory;
         }
         
         public void OnEnable()
@@ -54,7 +56,12 @@ namespace RudyAtkinson.Lobby.Controller
             
             if (args.ConnectionState == RemoteConnectionState.Started)
             {
-                var lobbyPlayer = Instantiate(_lobbyPlayerView, _lobbyPlayerParent, false);
+                var lobbyPlayer = _lobbyPlayerViewFactory.Create();
+                var lobbyPlayerTransform = lobbyPlayer.transform;
+                
+                lobbyPlayerTransform.SetParent(_lobbyPlayerParent);
+                lobbyPlayerTransform.localScale = Vector3.one;
+                
                 _networkManager.ServerManager.Spawn(lobbyPlayer.gameObject, connection);
             }
             else
