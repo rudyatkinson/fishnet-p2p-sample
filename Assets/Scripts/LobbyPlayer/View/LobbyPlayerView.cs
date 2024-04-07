@@ -15,7 +15,6 @@ namespace RudyAtkinson.LobbyPlayer.View
 
         [SerializeField] private TMP_Text _playerNameText;
         [SerializeField] private Toggle _readyToggle;
-        [SerializeField] private Button _readyButton;
 
         #region Client
 
@@ -39,22 +38,17 @@ namespace RudyAtkinson.LobbyPlayer.View
             {
                 ServerRPCSetName(PlayerPrefs.GetString("rudyatkinson-player-name"));
                 
-                _readyButton.onClick.AddListener(OnReadyButtonClick);
+                _readyToggle.onValueChanged.AddListener(ServerRPCPlayerReady);
             }
             else
             {
-                _readyButton.onClick.RemoveListener(OnReadyButtonClick);
+                _readyToggle.onValueChanged.RemoveListener(ServerRPCPlayerReady);
             }
-        }
-
-        private void OnReadyButtonClick()
-        {
-            ServerRPCPlayerReady();
         }
 
         private void SetActiveReadyButton(bool isActive)
         {
-            _readyButton.gameObject.SetActive(isActive);
+            _readyToggle.interactable = isActive;
         }
         
         private void OnNameChange(string prev, string next, bool asServer)
@@ -78,16 +72,16 @@ namespace RudyAtkinson.LobbyPlayer.View
         }
         
         [ServerRpc(RequireOwnership = true)]
-        private void ServerRPCPlayerReady(NetworkConnection conn = null)
+        private void ServerRPCPlayerReady(bool isReady)
         {
-            ChangeReady();
+            ChangeReady(isReady);
         }
 
         [Server]
-        private void ChangeReady()
+        private void ChangeReady(bool isReady)
         {
-            _ready.Value = !_ready.Value;
-            _readyToggle.isOn = _ready.Value;
+            _ready.Value = isReady;
+            _readyToggle.isOn = isReady;
         }
 
         #endregion
