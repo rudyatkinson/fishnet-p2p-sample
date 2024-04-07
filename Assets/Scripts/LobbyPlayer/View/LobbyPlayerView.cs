@@ -14,21 +14,28 @@ namespace RudyAtkinson.LobbyPlayer.View
         [SerializeField] private Toggle _readyToggle;
         [SerializeField] private Button _readyButton;
 
-        private void OnEnable()
+        public override void OnStartClient()
         {
             _ready.OnChange += OnReadyChange;
         }
 
-        private void OnDisable()
+        public override void OnStopClient()
         {
             _ready.OnChange -= OnReadyChange;
         }
 
         public override void OnOwnershipClient(NetworkConnection prevOwner)
         {
-            SetActiveReadyButton(true);
-            
-            _readyButton.onClick.AddListener(OnReadyButtonClick);
+            SetActiveReadyButton(IsOwner);
+
+            if (IsOwner)
+            {
+                _readyButton.onClick.AddListener(OnReadyButtonClick);
+            }
+            else
+            {
+                _readyButton.onClick.RemoveListener(OnReadyButtonClick);
+            }
         }
 
         private void OnReadyButtonClick()
@@ -54,6 +61,7 @@ namespace RudyAtkinson.LobbyPlayer.View
             _readyToggle.isOn = _ready.Value;
         }
         
+        [ObserversRpc]
         private void OnReadyChange(bool prev, bool next, bool asServer)
         {
             if (!asServer)
