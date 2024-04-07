@@ -17,7 +17,6 @@ namespace RudyAtkinson.Lobby.Controller
         private LobbyPlayerViewFactory _lobbyPlayerViewFactory;
         private LobbyRepository _lobbyRepository;
 
-        [SerializeField] private LobbyPlayerView _lobbyPlayerView;
         [SerializeField] private Transform _lobbyPlayerParent;
         
         [Inject]
@@ -37,7 +36,6 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.ServerManager.OnServerConnectionState += OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += OnClientStateChanged;
-            _networkManager.ClientManager.Connection.OnObjectAdded += OnConnectionObjectAdded;
         }
         
         public void OnDisable()
@@ -45,7 +43,6 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.ServerManager.OnServerConnectionState -= OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState -= OnClientStateChanged;
-            _networkManager.ClientManager.Connection.OnObjectAdded -= OnConnectionObjectAdded;
         }
 
         #region Client Callbacks
@@ -54,12 +51,15 @@ namespace RudyAtkinson.Lobby.Controller
         {
             Debug.Log($"[Client] Connection state: {args.ConnectionState}");
         }
-        
-        private void OnConnectionObjectAdded(NetworkObject obj)
-        {
-            var lobbyPlayerViewValid = obj.TryGetComponent<LobbyPlayerView>(out var lobbyPlayerView);
 
-            if (lobbyPlayerViewValid)
+        [TargetRpc]
+        private void RpcSetLobbyPlayerName(NetworkConnection target)
+        {
+            Debug.Log($"[Client] target: {target.ClientId}");
+
+            var lobbyPlayerValid = _networkManager.ClientManager.Connection.FirstObject.TryGetComponent<LobbyPlayerView>(out var lobbyPlayerView);
+
+            if (lobbyPlayerValid)
             {
                 lobbyPlayerView.ServerRPCSetName(_lobbyRepository.PlayerName);
             }
@@ -90,6 +90,15 @@ namespace RudyAtkinson.Lobby.Controller
                 lobbyPlayerTransform.localScale = Vector3.one;
                 
                 _networkManager.ServerManager.Spawn(lobbyPlayer.gameObject, connection);
+
+                if (connection.IsHost)
+                {
+                    lobbyPlayer.ServerRPCSetName(_lobbyRepository.PlayerName);
+                }
+                else
+                {
+                    RpcSetLobbyPlayerName(connection);
+                }
             }
             else
             {
