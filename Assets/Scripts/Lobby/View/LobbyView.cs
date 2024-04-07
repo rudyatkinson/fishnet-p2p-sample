@@ -10,7 +10,7 @@ namespace RudyAtkinson.Lobby.View
     {
         private NetworkManager _networkManager;
         private LobbyRepository _lobbyRepository;
-
+        
         public event Action HostButtonClick;
         public event Action JoinButtonClick;
         
