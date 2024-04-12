@@ -1,8 +1,11 @@
 using FishNet.Managing;
 using FishNet.Transporting.FishyEOSPlugin;
+using MessagePipe;
 using RudyAtkinson.Lobby.Controller;
+using RudyAtkinson.Lobby.Model;
 using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
+using RudyAtkinson.LobbyPlayer.Model;
 using RudyAtkinson.LobbyPlayer.View;
 using UnityEngine;
 using VContainer;
@@ -30,6 +33,11 @@ namespace RudyAtkinson.Scopes
                 .AsImplementedInterfaces();
             builder.Register<LobbyRepository>(Lifetime.Singleton);
             builder.Register<LobbyPlayerViewFactory>(Lifetime.Singleton);
+
+            builder.RegisterMessagePipe();
+            builder.RegisterBuildCallback(c => GlobalMessagePipe.SetProvider(c.AsServiceProvider()));
+            builder.RegisterEntryPoint<LobbyPlayerReady>();
+            builder.RegisterEntryPoint<AllLobbyPlayersReadyCountdown>();
         }
     }
 }

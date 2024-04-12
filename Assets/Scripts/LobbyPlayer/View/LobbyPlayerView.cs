@@ -1,9 +1,12 @@
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using MessagePipe;
+using RudyAtkinson.LobbyPlayer.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 namespace RudyAtkinson.LobbyPlayer.View
 {
@@ -15,6 +18,8 @@ namespace RudyAtkinson.LobbyPlayer.View
         [SerializeField] private TMP_Text _playerNameText;
         [SerializeField] private Toggle _readyToggle;
 
+        private IPublisher<LobbyPlayerReady> _lobbyPlayerReady;
+        
         #region Client
 
         public override void OnStartClient()
@@ -61,9 +66,16 @@ namespace RudyAtkinson.LobbyPlayer.View
             _readyToggle.isOn = next;
         }
 
+        public bool Ready => _ready.Value;
+
         #endregion
         
         #region Server
+        
+        public void SetDependencies(IPublisher<LobbyPlayerReady> lobbyPlayerReady)
+        {
+            _lobbyPlayerReady = lobbyPlayerReady;
+        }
 
         [ServerRpc(RequireOwnership = true)]
         private void ServerRPCSetName(string playerName)
@@ -82,6 +94,8 @@ namespace RudyAtkinson.LobbyPlayer.View
         {
             _ready.Value = isReady;
             _readyToggle.isOn = isReady;
+            
+            _lobbyPlayerReady?.Publish(new LobbyPlayerReady());
         }
 
         #endregion
