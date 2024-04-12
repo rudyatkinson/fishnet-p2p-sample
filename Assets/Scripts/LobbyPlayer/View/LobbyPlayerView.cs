@@ -1,7 +1,6 @@
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using RudyAtkinson.Lobby.Repository;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,6 +48,7 @@ namespace RudyAtkinson.LobbyPlayer.View
         private void SetActiveReadyButton(bool isActive)
         {
             _readyToggle.interactable = isActive;
+            _readyToggle.targetGraphic.enabled = isActive;
         }
         
         private void OnNameChange(string prev, string next, bool asServer)

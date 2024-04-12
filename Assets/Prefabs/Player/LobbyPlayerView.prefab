@@ -406,7 +406,6 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 7089422749141869063}
   _playerNameText: {fileID: 7076360349373816151}
   _readyToggle: {fileID: 2581654055147354498}
-  _readyButton: {fileID: 0}
 --- !u!114 &880154711859106328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,10 +484,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7021541004542453201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 258.655, y: 0}
-  m_SizeDelta: {x: 0, y: 50}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 258.655, y: -50}
+  m_SizeDelta: {x: 317.31, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2735074634679334662
 CanvasRenderer:
