@@ -14,9 +14,6 @@ namespace RudyAtkinson.Lobby.View
         private const int _width = 750;
         private const int _height = 225;
 
-        private AllLobbyPlayersReadyCountdown _allPlayersReady = new (false);
-        private LocalConnectionState _localConnectionState;
-        
         private NetworkManager _networkManager;
         private LobbyRepository _lobbyRepository;
 
@@ -37,7 +34,6 @@ namespace RudyAtkinson.Lobby.View
             _lobbyRepository = lobbyRepository;
 
             _allLobbyPlayersReadyCountdownSubscriber = allLobbyPlayersReadyCountdownSubscriber;
-            
         }
 
         private void Awake()
@@ -52,7 +48,7 @@ namespace RudyAtkinson.Lobby.View
             var allLobbyPlayersReadyCountdownDisposable = _allLobbyPlayersReadyCountdownSubscriber.Subscribe(
                 obj =>
                 {
-                    _allPlayersReady = obj;
+                    _lobbyRepository.AllLobbyPlayersReadyCountdownData = obj;
                 });
             
             _messageDisposables = DisposableBag.Create(allLobbyPlayersReadyCountdownDisposable);
@@ -67,20 +63,20 @@ namespace RudyAtkinson.Lobby.View
 
         private void OnGUI()
         {
-            if (_localConnectionState is LocalConnectionState.Stopped)
+            if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Stopped)
             {
                 DrawHostAndJoinUI();
             }
-            else if (_localConnectionState is LocalConnectionState.Starting)
+            else if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Starting)
             {
                 DrawConnectionStartingUI();
             }
-            else if (_localConnectionState is LocalConnectionState.Stopping)
+            else if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Stopping)
             {
                 DrawConnectionStoppingUI();
             }
 
-            if (_allPlayersReady.Enabled)
+            if (_lobbyRepository.AllLobbyPlayersReadyCountdownData.Enabled)
             {
                 DrawAllLobbyPlayersReadyCountdownUI();
             }
@@ -137,14 +133,14 @@ namespace RudyAtkinson.Lobby.View
         {
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .9f - _height * .5f, _width, _height));
             
-            GUILayout.Label($"Starting in {_allPlayersReady.Countdown}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.Label($"Starting in {_lobbyRepository.AllLobbyPlayersReadyCountdownData.Countdown}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
 
             GUILayout.EndArea();
         }
         
         private void OnClientConnectionStateChanged(ClientConnectionStateArgs obj)
         {
-            _localConnectionState = obj.ConnectionState;
+            _lobbyRepository.LocalConnectionState = obj.ConnectionState;
         }
     }
 }
