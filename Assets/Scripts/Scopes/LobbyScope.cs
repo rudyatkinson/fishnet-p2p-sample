@@ -7,6 +7,7 @@ using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
 using RudyAtkinson.LobbyPlayer.Model;
 using RudyAtkinson.LobbyPlayer.View;
+using RudyAtkinson.Tile.Model;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -15,16 +16,12 @@ namespace RudyAtkinson.Scopes
 {
     public class LobbyScope : LifetimeScope
     {
-        [SerializeField] private NetworkManager _networkManager;
-        [SerializeField] private FishyEOS _fishyEos;
         [SerializeField] private LobbyView _lobbyView;
         [SerializeField] private LobbyServerController _lobbyServerController;
         [SerializeField] private LobbyPlayerView _lobbyPlayerView;
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(_networkManager);
-            builder.RegisterComponent(_fishyEos);
             builder.RegisterComponent(_lobbyView);
             builder.RegisterComponent(_lobbyServerController);
             builder.RegisterComponent(_lobbyPlayerView);
@@ -35,7 +32,6 @@ namespace RudyAtkinson.Scopes
             builder.Register<LobbyPlayerViewFactory>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();
-            builder.RegisterBuildCallback(c => GlobalMessagePipe.SetProvider(c.AsServiceProvider()));
             builder.RegisterEntryPoint<LobbyPlayerReady>();
             builder.RegisterEntryPoint<AllLobbyPlayersReadyCountdown>();
         }
