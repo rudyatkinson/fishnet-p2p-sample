@@ -1,6 +1,7 @@
 using System;
 using FishNet.Managing;
 using FishNet.Transporting;
+using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
 using RudyAtkinson.Lobby.Model;
 using RudyAtkinson.Lobby.Repository;
@@ -15,6 +16,7 @@ namespace RudyAtkinson.Lobby.View
         private const int _height = 225;
 
         private NetworkManager _networkManager;
+        private FishyEOS _fishyEos;
         private LobbyRepository _lobbyRepository;
 
         private ISubscriber<AllLobbyPlayersReadyCountdown> _allLobbyPlayersReadyCountdownSubscriber;
@@ -28,9 +30,11 @@ namespace RudyAtkinson.Lobby.View
         [Inject]
         public void Construct(LobbyRepository lobbyRepository,
             NetworkManager networkManager,
+            FishyEOS fishyEos,
             ISubscriber<AllLobbyPlayersReadyCountdown> allLobbyPlayersReadyCountdownSubscriber)
         {
             _networkManager = networkManager;
+            _fishyEos = fishyEos;
             _lobbyRepository = lobbyRepository;
 
             _allLobbyPlayersReadyCountdownSubscriber = allLobbyPlayersReadyCountdownSubscriber;
@@ -74,6 +78,10 @@ namespace RudyAtkinson.Lobby.View
             else if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Stopping)
             {
                 DrawConnectionStoppingUI();
+            }
+            else if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Started)
+            {
+                DrawConnectionStartedUI();
             }
 
             if (_lobbyRepository.AllLobbyPlayersReadyCountdownData.Enabled)
@@ -126,6 +134,18 @@ namespace RudyAtkinson.Lobby.View
         {
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - _height * .5f, _width, _height));
             GUILayout.Label("Leaving...", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.EndArea();
+        }
+        
+        private void DrawConnectionStartedUI()
+        {
+            var address = _networkManager.IsHostStarted ? _fishyEos.LocalProductUserId : _fishyEos.RemoteProductUserId;
+            
+            GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .1f - _height * .5f, _width, _height));
+            if (GUILayout.Button(address, new GUIStyle("label") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))
+            {
+                GUIUtility.systemCopyBuffer = address;
+            }
             GUILayout.EndArea();
         }
 
