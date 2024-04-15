@@ -790,7 +790,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: FISHNET;FISHNET_V4
+    Android: FISHNET;FISHNET_V4;FISHNET_STABLE_MODE;FISHNET_DISABLE_V3TOV4_HELPERS
     Standalone: FISHNET;FISHNET_V4;FISHNET_STABLE_MODE
   additionalCompilerArguments: {}
   platformArchitecture: {}
