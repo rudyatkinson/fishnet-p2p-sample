@@ -1,16 +1,18 @@
 using System;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using MessagePipe;
 using RudyAtkinson.Tile.Model;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VContainer;
 
 namespace RudyAtkinson.Tile.View
 {
     public class TileView : NetworkBehaviour, IPointerDownHandler
     {
-        public TileModel Tile { get; private set; }
+        private readonly SyncVar<TileModel> _tileModel = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         
         [SerializeField] private Image _tileBackground;
         [SerializeField] private Color _hoverColor;
@@ -19,18 +21,41 @@ namespace RudyAtkinson.Tile.View
 
         private IPublisher<TileClick> _tileClick;
         
-        public void Init(TileModel tileModel,
-            IPublisher<TileClick> tileClick)
+        [Inject]
+        private void Construct(IPublisher<TileClick> tileClick)
         {
-            Tile = tileModel;
             _tileClick = tileClick;
-            
+        }
+
+        public override void OnStartServer()
+        {
+            var index = transform.GetSiblingIndex();
+
+            var x = index / 3;
+            var y = index % 3;
+
+            _tileModel.Value = new TileModel(x, y, '.');
+        }
+
+        public override void OnStartClient()
+        {
+            _tileModel.OnChange += OnTileModelModelChange;
+        }
+
+        public override void OnStopClient()
+        {
+            _tileModel.OnChange -= OnTileModelModelChange;
+        }
+
+        private void OnTileModelModelChange(TileModel prev, TileModel next, bool asserver)
+        {
             SetBaseColor();
         }
-        
+
         private void SetBaseColor()
         {
-            _tileBackground.color = (Tile.X % 2 == 0 && Tile.Y % 2 != 0) || (Tile.X % 2 != 0 && Tile.Y % 2 == 0) ? _baseEvenColor : _baseOddColor;
+            var tile = _tileModel.Value;
+            _tileBackground.color = (tile.X % 2 == 0 && tile.Y % 2 != 0) || (tile.X % 2 != 0 && tile.Y % 2 == 0) ? _baseEvenColor : _baseOddColor;
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -39,5 +64,7 @@ namespace RudyAtkinson.Tile.View
             
             SetBaseColor();
         }
+
+        public TileModel TileModel => _tileModel.Value;
     }
 }

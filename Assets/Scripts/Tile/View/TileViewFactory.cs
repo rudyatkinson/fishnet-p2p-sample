@@ -18,10 +18,9 @@ namespace RudyAtkinson.Tile.View
             _tileClickPublisher = tileClickPublisher;
         }
 
-        public TileView Create(TileModel tileModel)
+        public TileView Create()
         {
             var obj = Object.Instantiate(_tileView, null, false);
-            obj.Init(tileModel, _tileClickPublisher);
             
             return obj;
         }
