@@ -18,7 +18,6 @@ namespace RudyAtkinson.Scopes
             builder.RegisterComponent(_tileServerController);
             builder.RegisterComponent(_tileView);
             
-            builder.Register<TileViewFactory>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClick>();
