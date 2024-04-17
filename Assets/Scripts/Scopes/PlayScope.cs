@@ -10,12 +10,12 @@ namespace RudyAtkinson.Scopes
 {
     public class PlayScope: LifetimeScope
     {
-        [SerializeField] private TileServerController _tileServerController;
+        [SerializeField] private TileNetworkController _tileNetworkController;
         [SerializeField] private TileView _tileView;
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(_tileServerController);
+            builder.RegisterComponent(_tileNetworkController);
             builder.RegisterComponent(_tileView);
 
             builder.RegisterMessagePipe();

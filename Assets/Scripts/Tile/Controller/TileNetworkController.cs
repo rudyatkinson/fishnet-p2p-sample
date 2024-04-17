@@ -1,6 +1,5 @@
 using System;
 using FishNet.Connection;
-using FishNet.Managing;
 using FishNet.Object;
 using MessagePipe;
 using RudyAtkinson.Tile.Model;
@@ -12,7 +11,6 @@ namespace RudyAtkinson.Tile.Controller
 {
     public class TileServerController : NetworkBehaviour
     {
-        private NetworkManager _networkManager;
         private ISubscriber<TileClick> _tileClickSubscriber;
 
         private IDisposable _subscriberDisposables;
@@ -20,10 +18,8 @@ namespace RudyAtkinson.Tile.Controller
         [SerializeField] private TileView[] _tileViews;
         
         [Inject]
-        private void Construct(NetworkManager networkManager,
-            ISubscriber<TileClick> tileClickSubscriber)
+        private void Construct(ISubscriber<TileClick> tileClickSubscriber)
         {
-            _networkManager = networkManager;
             _tileClickSubscriber = tileClickSubscriber;
         }
 
