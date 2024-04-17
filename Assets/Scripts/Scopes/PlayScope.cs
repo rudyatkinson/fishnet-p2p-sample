@@ -1,6 +1,7 @@
 ﻿using MessagePipe;
 using RudyAtkinson.Tile.Controller;
 using RudyAtkinson.Tile.Model;
+using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
 using UnityEngine;
 using VContainer;
@@ -17,6 +18,8 @@ namespace RudyAtkinson.Scopes
         {
             builder.RegisterComponent(_tileNetworkController);
             builder.RegisterComponent(_tileView);
+
+            builder.Register<TileRepository>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClick>();
