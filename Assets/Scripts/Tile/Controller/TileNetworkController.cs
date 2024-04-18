@@ -4,6 +4,7 @@ using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using MessagePipe;
+using RudyAtkinson.GameplayPlayer.Repository;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
@@ -16,6 +17,7 @@ namespace RudyAtkinson.Tile.Controller
     {
         private ISubscriber<TileClick> _tileClickSubscriber;
         private TileRepository _tileRepository;
+        private GameplayPlayerRepository _gameplayPlayerRepository;
 
         private IDisposable _subscriberDisposables;
         
@@ -23,10 +25,12 @@ namespace RudyAtkinson.Tile.Controller
         
         [Inject]
         private void Construct(ISubscriber<TileClick> tileClickSubscriber,
-            TileRepository tileRepository)
+            TileRepository tileRepository,
+            GameplayPlayerRepository gameplayPlayerRepository)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
+            _gameplayPlayerRepository = gameplayPlayerRepository;
         }
 
         private void OnEnable()
@@ -47,14 +51,24 @@ namespace RudyAtkinson.Tile.Controller
         [ServerRpc(RequireOwnership = false)]
         private void Server_OnTileClick(TileClick tileClick, NetworkConnection conn = null)
         {
-            var mark = conn.IsHost ? 'X' : 'O';
+            var hostMark = 'X';
+            var opponentMark = 'O';
+            var isHost = conn.IsHost;
+            var mark = isHost ? hostMark : opponentMark;
 
             var tile = tileClick.Tile;
             var tileModel = tile.TileModel.Value;
+            var tileMark = tileModel.Mark;
 
-            if (mark == tileModel.Mark)
+            if (mark != _gameplayPlayerRepository.GetMarkTurn())
             {
-                Debug.Log($"Player clicked the tile owned by already.");
+                Target_NotYourTurn(conn);
+                return;
+            }
+
+            if (tileMark != ' ') 
+            {
+                Debug.Log($"Clicked Tile owned already!");
                 return;
             }
             
@@ -74,7 +88,7 @@ namespace RudyAtkinson.Tile.Controller
                 var obsoleteTile = markQueue.Dequeue();
                 var obsoleteTileModel = obsoleteTile.TileModel.Value;
 
-                obsoleteTileModel.Mark = '.';
+                obsoleteTileModel.Mark = ' ';
                 
                 obsoleteTile.TileModel.Value = obsoleteTileModel;
             }
@@ -85,6 +99,26 @@ namespace RudyAtkinson.Tile.Controller
                 color.a = .25f;
                 markQueue.First().Color.Value = color;
             }
+
+            var nextTurnMark = isHost ? opponentMark : hostMark;
+            
+            _gameplayPlayerRepository.SetMarkTurn(nextTurnMark);
+            
+            Observers_TurnChanged(nextTurnMark);
+        }
+
+        [TargetRpc]
+        private void Target_NotYourTurn(NetworkConnection conn)
+        {
+            // TODO: Inform the player
+            Debug.Log("Not my turn yet!");
+        }
+
+        [ObserversRpc]
+        private void Observers_TurnChanged(char turnMark)
+        {
+            // TODO: Inform the player
+            Debug.Log($"Turn changed: {turnMark}");
         }
     }
 }
