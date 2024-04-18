@@ -165,7 +165,7 @@ MonoBehaviour:
   - {fileID: 1137930469}
   - {fileID: 182210371}
   - {fileID: 263838308}
-  _tileServerController: {fileID: 566208627}
+  _tileNetworkController: {fileID: 566208627}
   _tileView: {fileID: 8471800522875937261, guid: f2778da09b8c853409422c73992f39da, type: 3}
 --- !u!4 &4932771
 Transform:
