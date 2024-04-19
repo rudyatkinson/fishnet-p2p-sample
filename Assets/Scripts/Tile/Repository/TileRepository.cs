@@ -11,8 +11,8 @@ namespace RudyAtkinson.Tile.Repository
 
         public char[,] MarkMatrix()
         {
-            var maxXValue = TileViews.Max(tile => tile.TileModel.Value.X);
-            var maxYValue = TileViews.Max(tile => tile.TileModel.Value.Y);
+            var maxXValue = TileViews.Max(tile => tile.TileModel.Value.X + 1);
+            var maxYValue = TileViews.Max(tile => tile.TileModel.Value.Y + 1);
             
             var matrix = new char[maxXValue, maxYValue];
 

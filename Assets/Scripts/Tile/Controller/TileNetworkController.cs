@@ -104,7 +104,45 @@ namespace RudyAtkinson.Tile.Controller
             
             _gameplayPlayerRepository.SetMarkTurn(nextTurnMark);
             
-            Observers_TurnChanged(nextTurnMark);
+            var hasWon = CheckForWin(_tileRepository.MarkMatrix(), mark);
+            if (hasWon)
+            {
+                Observers_PlayerWin(isHost);
+            }
+            else
+            {
+                Observers_TurnChanged(nextTurnMark);
+            }
+        }
+        
+        private bool CheckForWin(char[,] grid, char playerMark)
+        {
+            for (int row = 0; row < grid.GetLength(0); row++)
+            {
+                if (grid[row, 0] == playerMark && grid[row, 1] == playerMark && grid[row, 2] == playerMark)
+                {
+                    return true;
+                }
+            }
+            
+            for (int col = 0; col < grid.GetLength(1); col++)
+            {
+                if (grid[0, col] == playerMark && grid[1, col] == playerMark && grid[2, col] == playerMark)
+                {
+                    return true;
+                }
+            }
+            
+            if (grid[0, 0] == playerMark && grid[1, 1] == playerMark && grid[2, 2] == playerMark)
+            {
+                return true;
+            }
+            if (grid[0, 2] == playerMark && grid[1, 1] == playerMark && grid[2, 0] == playerMark)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         [TargetRpc]
@@ -119,6 +157,13 @@ namespace RudyAtkinson.Tile.Controller
         {
             // TODO: Inform the player
             Debug.Log($"Turn changed: {turnMark}");
+        }
+
+        [ObserversRpc]
+        private void Observers_PlayerWin(bool isHostWin)
+        {
+            var playerMark = isHostWin ? 'X' : 'O';
+            Debug.Log($"Player {playerMark} Won!");
         }
     }
 }
