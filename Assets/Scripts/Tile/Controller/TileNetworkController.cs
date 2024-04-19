@@ -128,7 +128,12 @@ namespace RudyAtkinson.Tile.Controller
                 
                 Observers_PlayerWin(isHost, winDict);
 
-                StartNewGameCountdown();
+                StartNewGameCountdown().AsAsyncUnitUniTask().ContinueWith(_ =>
+                {
+                    ClearTiles();
+
+                    LockPlayerInput(false);
+                });
             }
             else
             {
@@ -166,7 +171,7 @@ namespace RudyAtkinson.Tile.Controller
             return false;
         }
         
-        private async void StartNewGameCountdown()
+        private async UniTask StartNewGameCountdown()
         {
             for (int countdown = 5; countdown >= 0; countdown--)
             {
@@ -177,14 +182,25 @@ namespace RudyAtkinson.Tile.Controller
                 if (countdown <= 0)
                 {
                     Observers_NewGameStart(_gameplayRepository.GetMarkTurn());
-                    
-                    LockPlayerInput(false);
                 }
             }
         }
-        
+
+        private void ClearTiles()
+        {
+            Debug.Log($"[Server] Tiles Cleared!");
+            foreach (var tileView in _tileRepository.TileViews)
+            {
+                var tileModel = tileView.TileModel.Value;
+                tileModel.Mark = ' ';
+
+                tileView.TileModel.Value = tileModel;
+            }
+        }
+
         private void LockPlayerInput(bool isLocked)
         {
+            Debug.Log($"[Server] Tiles locked: {isLocked}");
             _gameplayRepository.SetPlayerInputLocked(isLocked);
         }
         #endregion
