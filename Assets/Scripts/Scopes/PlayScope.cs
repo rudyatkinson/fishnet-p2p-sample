@@ -1,6 +1,6 @@
 ﻿using MessagePipe;
+using RudyAtkinson.Gameplay.Controller;
 using RudyAtkinson.Gameplay.Repository;
-using RudyAtkinson.Tile.Controller;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
@@ -12,12 +12,12 @@ namespace RudyAtkinson.Scopes
 {
     public class PlayScope: LifetimeScope
     {
-        [SerializeField] private TileNetworkController _tileNetworkController;
+        [SerializeField] private GameplayNetworkController gameplayNetworkController;
         [SerializeField] private TileView _tileView;
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(_tileNetworkController);
+            builder.RegisterComponent(gameplayNetworkController);
             builder.RegisterComponent(_tileView);
 
             builder.Register<TileRepository>(Lifetime.Singleton);

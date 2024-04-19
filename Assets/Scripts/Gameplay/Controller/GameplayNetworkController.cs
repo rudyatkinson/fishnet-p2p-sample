@@ -12,9 +12,9 @@ using RudyAtkinson.Tile.View;
 using UnityEngine;
 using VContainer;
 
-namespace RudyAtkinson.Tile.Controller
+namespace RudyAtkinson.Gameplay.Controller
 {
-    public class TileNetworkController : NetworkBehaviour
+    public class GameplayNetworkController : NetworkBehaviour
     {
         private TileRepository _tileRepository;
         private GameplayRepository _gameplayRepository;
