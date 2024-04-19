@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
 using MessagePipe;
@@ -18,6 +19,8 @@ namespace RudyAtkinson.Tile.Controller
         private ISubscriber<TileClick> _tileClickSubscriber;
         private TileRepository _tileRepository;
         private GameplayRepository _gameplayRepository;
+        private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
+        private IPublisher<NewGameStart> _newGameStartPublisher;
 
         private IDisposable _subscriberDisposables;
         
@@ -26,11 +29,15 @@ namespace RudyAtkinson.Tile.Controller
         [Inject]
         private void Construct(ISubscriber<TileClick> tileClickSubscriber,
             TileRepository tileRepository,
-            GameplayRepository gameplayRepository)
+            GameplayRepository gameplayRepository,
+            IPublisher<NewGameCountdown> newGameCountdownPublisher,
+            IPublisher<NewGameStart> newGameStartPublisher)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
             _gameplayRepository = gameplayRepository;
+            _newGameCountdownPublisher = newGameCountdownPublisher;
+            _newGameStartPublisher = newGameStartPublisher;
         }
 
         private void OnEnable()
@@ -107,7 +114,12 @@ namespace RudyAtkinson.Tile.Controller
             var hasWon = CheckForWin(_tileRepository.MarkMatrix(), mark);
             if (hasWon)
             {
-                Observers_PlayerWin(isHost);
+                var winDict = _gameplayRepository.GetWinDict();
+                winDict[mark]++;
+                
+                Observers_PlayerWin(isHost, winDict);
+
+                StartNewGameCountdown();
             }
             else
             {
@@ -160,10 +172,46 @@ namespace RudyAtkinson.Tile.Controller
         }
 
         [ObserversRpc]
-        private void Observers_PlayerWin(bool isHostWin)
+        private void Observers_PlayerWin(bool isHostWin, Dictionary<char, int> winDict)
         {
             var playerMark = isHostWin ? 'X' : 'O';
             Debug.Log($"Player {playerMark} Won!");
+            
+            foreach (var kvp in winDict)
+            {
+                Debug.Log($"{kvp.Key}: {kvp.Value}");
+            }
+        }
+        
+        private async void StartNewGameCountdown()
+        {
+            for (int countdown = 5; countdown >= 0; countdown++)
+            {
+                Observers_NewGameCountdown(countdown);
+
+                await UniTask.Delay(TimeSpan.FromSeconds(1));
+                
+                if (countdown <= 0)
+                {
+                    Observers_NewGameStart(_gameplayRepository.GetMarkTurn());
+                }
+            }
+        }
+
+        [ObserversRpc]
+        private void Observers_NewGameCountdown(int countdown)
+        {
+            Debug.Log($"[Observer] Observers_NewGameCountdown Countdown: {countdown}");
+            
+            _newGameCountdownPublisher?.Publish(new NewGameCountdown() {Countdown = countdown});
+        }
+
+        [ObserversRpc]
+        private void Observers_NewGameStart(char gameStarterMark)
+        {
+            Debug.Log($"[Observer] Observers_NewGameStart gameStarterMark: {gameStarterMark}");
+            
+            _newGameStartPublisher?.Publish(new NewGameStart() {GameStarterMark = gameStarterMark});
         }
     }
 }

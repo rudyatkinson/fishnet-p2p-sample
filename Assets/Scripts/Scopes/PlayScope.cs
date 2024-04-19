@@ -25,6 +25,8 @@ namespace RudyAtkinson.Scopes
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClick>();
+            builder.RegisterEntryPoint<NewGameCountdown>();
+            builder.RegisterEntryPoint<NewGameStart>();
         }
     }
 }
