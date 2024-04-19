@@ -185,7 +185,7 @@ namespace RudyAtkinson.Tile.Controller
         
         private async void StartNewGameCountdown()
         {
-            for (int countdown = 5; countdown >= 0; countdown++)
+            for (int countdown = 5; countdown >= 0; countdown--)
             {
                 Observers_NewGameCountdown(countdown);
 
