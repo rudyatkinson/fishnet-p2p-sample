@@ -1,6 +1,6 @@
-namespace RudyAtkinson.GameplayPlayer.Repository
+namespace RudyAtkinson.Gameplay.Repository
 {
-    public class GameplayPlayerRepository
+    public class GameplayRepository
     {
         private char _markTurn = 'X';
 

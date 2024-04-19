@@ -1,5 +1,5 @@
 ﻿using MessagePipe;
-using RudyAtkinson.GameplayPlayer.Repository;
+using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Tile.Controller;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
@@ -21,7 +21,7 @@ namespace RudyAtkinson.Scopes
             builder.RegisterComponent(_tileView);
 
             builder.Register<TileRepository>(Lifetime.Singleton);
-            builder.Register<GameplayPlayerRepository>(Lifetime.Singleton);
+            builder.Register<GameplayRepository>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClick>();

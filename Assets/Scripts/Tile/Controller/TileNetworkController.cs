@@ -4,7 +4,7 @@ using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using MessagePipe;
-using RudyAtkinson.GameplayPlayer.Repository;
+using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
@@ -17,7 +17,7 @@ namespace RudyAtkinson.Tile.Controller
     {
         private ISubscriber<TileClick> _tileClickSubscriber;
         private TileRepository _tileRepository;
-        private GameplayPlayerRepository _gameplayPlayerRepository;
+        private GameplayRepository _gameplayRepository;
 
         private IDisposable _subscriberDisposables;
         
@@ -26,11 +26,11 @@ namespace RudyAtkinson.Tile.Controller
         [Inject]
         private void Construct(ISubscriber<TileClick> tileClickSubscriber,
             TileRepository tileRepository,
-            GameplayPlayerRepository gameplayPlayerRepository)
+            GameplayRepository gameplayRepository)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
-            _gameplayPlayerRepository = gameplayPlayerRepository;
+            _gameplayRepository = gameplayRepository;
         }
 
         private void OnEnable()
@@ -60,7 +60,7 @@ namespace RudyAtkinson.Tile.Controller
             var tileModel = tile.TileModel.Value;
             var tileMark = tileModel.Mark;
 
-            if (mark != _gameplayPlayerRepository.GetMarkTurn())
+            if (mark != _gameplayRepository.GetMarkTurn())
             {
                 Target_NotYourTurn(conn);
                 return;
@@ -102,7 +102,7 @@ namespace RudyAtkinson.Tile.Controller
 
             var nextTurnMark = isHost ? opponentMark : hostMark;
             
-            _gameplayPlayerRepository.SetMarkTurn(nextTurnMark);
+            _gameplayRepository.SetMarkTurn(nextTurnMark);
             
             var hasWon = CheckForWin(_tileRepository.MarkMatrix(), mark);
             if (hasWon)
