@@ -61,7 +61,7 @@ namespace RudyAtkinson.Tile.Controller
         {
             if (_gameplayRepository.GetPlayerInputLocked())
             {
-                Debug.Log($"Tried to click a tile during input locked.");
+                Debug.Log($"[Server] Tried to click a tile during input locked.");
                 return;
             }
             
@@ -82,7 +82,7 @@ namespace RudyAtkinson.Tile.Controller
 
             if (tileMark != ' ') 
             {
-                Debug.Log($"Clicked Tile owned already!");
+                Debug.Log($"[Server] Clicked Tile owned already!");
                 return;
             }
             
@@ -189,6 +189,8 @@ namespace RudyAtkinson.Tile.Controller
         private void ClearTiles()
         {
             Debug.Log($"[Server] Tiles Cleared!");
+            _tileRepository.TileMarkQueueDictionary.Clear();
+            
             foreach (var tileView in _tileRepository.TileViews)
             {
                 var tileModel = tileView.TileModel.Value;
@@ -210,7 +212,7 @@ namespace RudyAtkinson.Tile.Controller
         private void Target_NotYourTurn(NetworkConnection conn)
         {
             // TODO: Inform the player
-            Debug.Log("Not my turn yet!");
+            Debug.Log("[Target] Not my turn yet!");
         }
         #endregion
 
@@ -219,14 +221,14 @@ namespace RudyAtkinson.Tile.Controller
         private void Observers_TurnChanged(char turnMark)
         {
             // TODO: Inform the player
-            Debug.Log($"Turn changed: {turnMark}");
+            Debug.Log($"[Observer] Turn changed: {turnMark}");
         }
 
         [ObserversRpc]
         private void Observers_PlayerWin(bool isHostWin, Dictionary<char, int> winDict)
         {
             var playerMark = isHostWin ? 'X' : 'O';
-            Debug.Log($"Player {playerMark} Won!");
+            Debug.Log($"[Observer] Player {playerMark} Won!");
             
             foreach (var kvp in winDict)
             {
