@@ -6,6 +6,7 @@ namespace RudyAtkinson.Gameplay.Repository
     {
         private Dictionary<char, int> _winDict = new() { { 'X', 0 }, { 'O', 0 } };
         private char _markTurn = 'X';
+        private bool _playerInputLocked;
 
         public char GetMarkTurn()
         {
@@ -20,6 +21,16 @@ namespace RudyAtkinson.Gameplay.Repository
         public Dictionary<char, int> GetWinDict()
         {
             return _winDict;
+        }
+
+        public bool GetPlayerInputLocked()
+        {
+            return _playerInputLocked;
+        }
+
+        public void SetPlayerInputLocked(bool playerInputLocked)
+        {
+            _playerInputLocked = playerInputLocked;
         }
     }
 }

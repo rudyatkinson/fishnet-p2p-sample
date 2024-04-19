@@ -16,15 +16,15 @@ namespace RudyAtkinson.Tile.Controller
 {
     public class TileNetworkController : NetworkBehaviour
     {
-        private ISubscriber<TileClick> _tileClickSubscriber;
         private TileRepository _tileRepository;
         private GameplayRepository _gameplayRepository;
+        
         private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
         private IPublisher<NewGameStart> _newGameStartPublisher;
 
+        private ISubscriber<TileClick> _tileClickSubscriber;
+
         private IDisposable _subscriberDisposables;
-        
-        [SerializeField] private TileView[] _tileViews;
         
         [Inject]
         private void Construct(ISubscriber<TileClick> tileClickSubscriber,
@@ -55,9 +55,16 @@ namespace RudyAtkinson.Tile.Controller
             _subscriberDisposables?.Dispose();
         }
 
+        #region Server Logic
         [ServerRpc(RequireOwnership = false)]
         private void Server_OnTileClick(TileClick tileClick, NetworkConnection conn = null)
         {
+            if (_gameplayRepository.GetPlayerInputLocked())
+            {
+                Debug.Log($"Tried to click a tile during input locked.");
+                return;
+            }
+            
             var hostMark = 'X';
             var opponentMark = 'O';
             var isHost = conn.IsHost;
@@ -114,6 +121,8 @@ namespace RudyAtkinson.Tile.Controller
             var hasWon = CheckForWin(_tileRepository.MarkMatrix(), mark);
             if (hasWon)
             {
+                LockPlayerInput(true);
+                
                 var winDict = _gameplayRepository.GetWinDict();
                 winDict[mark]++;
                 
@@ -156,14 +165,40 @@ namespace RudyAtkinson.Tile.Controller
 
             return false;
         }
+        
+        private async void StartNewGameCountdown()
+        {
+            for (int countdown = 5; countdown >= 0; countdown--)
+            {
+                Observers_NewGameCountdown(countdown);
 
+                await UniTask.Delay(TimeSpan.FromSeconds(1));
+                
+                if (countdown <= 0)
+                {
+                    Observers_NewGameStart(_gameplayRepository.GetMarkTurn());
+                    
+                    LockPlayerInput(false);
+                }
+            }
+        }
+        
+        private void LockPlayerInput(bool isLocked)
+        {
+            _gameplayRepository.SetPlayerInputLocked(isLocked);
+        }
+        #endregion
+
+        #region TargetRPC
         [TargetRpc]
         private void Target_NotYourTurn(NetworkConnection conn)
         {
             // TODO: Inform the player
             Debug.Log("Not my turn yet!");
         }
+        #endregion
 
+        #region ObserversRPC
         [ObserversRpc]
         private void Observers_TurnChanged(char turnMark)
         {
@@ -182,21 +217,6 @@ namespace RudyAtkinson.Tile.Controller
                 Debug.Log($"{kvp.Key}: {kvp.Value}");
             }
         }
-        
-        private async void StartNewGameCountdown()
-        {
-            for (int countdown = 5; countdown >= 0; countdown--)
-            {
-                Observers_NewGameCountdown(countdown);
-
-                await UniTask.Delay(TimeSpan.FromSeconds(1));
-                
-                if (countdown <= 0)
-                {
-                    Observers_NewGameStart(_gameplayRepository.GetMarkTurn());
-                }
-            }
-        }
 
         [ObserversRpc]
         private void Observers_NewGameCountdown(int countdown)
@@ -213,5 +233,6 @@ namespace RudyAtkinson.Tile.Controller
             
             _newGameStartPublisher?.Publish(new NewGameStart() {GameStarterMark = gameStarterMark});
         }
+        #endregion
     }
 }
