@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Epic.OnlineServices.RTC;
 using FishNet.Connection;
+using FishNet.Managing;
 using FishNet.Object;
+using FishNet.Transporting;
+using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
 using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Tile.Model;
@@ -18,6 +22,7 @@ namespace RudyAtkinson.Gameplay.Controller
     {
         private TileRepository _tileRepository;
         private GameplayRepository _gameplayRepository;
+        private FishyEOS _fishyEos;
         
         private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
         private IPublisher<NewGameStart> _newGameStartPublisher;
@@ -31,13 +36,15 @@ namespace RudyAtkinson.Gameplay.Controller
             TileRepository tileRepository,
             GameplayRepository gameplayRepository,
             IPublisher<NewGameCountdown> newGameCountdownPublisher,
-            IPublisher<NewGameStart> newGameStartPublisher)
+            IPublisher<NewGameStart> newGameStartPublisher,
+            FishyEOS fishyEos)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
             _gameplayRepository = gameplayRepository;
             _newGameCountdownPublisher = newGameCountdownPublisher;
             _newGameStartPublisher = newGameStartPublisher;
+            _fishyEos = fishyEos;
         }
 
         private void OnEnable()
@@ -47,11 +54,15 @@ namespace RudyAtkinson.Gameplay.Controller
                 Server_OnTileClick(tileClick);
             });
 
+            _fishyEos.OnClientConnectionState += OnClientConnectionStateChange;
+
             _subscriberDisposables = DisposableBag.Create(tileClickDisposable);
         }
 
         private void OnDisable()
         {
+            _fishyEos.OnClientConnectionState -= OnClientConnectionStateChange;
+
             _subscriberDisposables?.Dispose();
         }
 
@@ -204,6 +215,16 @@ namespace RudyAtkinson.Gameplay.Controller
         {
             Debug.Log($"[Server] Tiles locked: {isLocked}");
             _gameplayRepository.SetPlayerInputLocked(isLocked);
+        }
+        #endregion
+        
+        #region Client Logic
+        private void OnClientConnectionStateChange(ClientConnectionStateArgs obj)
+        {
+            if (obj.ConnectionState == LocalConnectionState.Stopping)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+            }
         }
         #endregion
 
