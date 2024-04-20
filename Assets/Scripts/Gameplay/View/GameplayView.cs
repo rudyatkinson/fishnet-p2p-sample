@@ -18,7 +18,7 @@ namespace RudyAtkinson.Gameplay.View
 
         private TMP_Text _informerTextPrefab;
 
-        private IPublisher<LeaveButtonClick> _leaveButtonClickPublisher;
+        private IPublisher<LeaveButtonClickMessage> _leaveButtonClickPublisher;
         
         private ISubscriber<NewGameCountdown> _newGameCountdownSubscriber;
         private ISubscriber<NewGameStart> _newGameStartSubscriber;
@@ -30,7 +30,7 @@ namespace RudyAtkinson.Gameplay.View
         private void Construct(TMP_Text informerTextPrefab,
             ISubscriber<NewGameCountdown> newGameCountdownSubscriber,
             ISubscriber<NewGameStart> newGameStartSubscriber,
-            IPublisher<LeaveButtonClick> leaveButtonClickPublisher)
+            IPublisher<LeaveButtonClickMessage> leaveButtonClickPublisher)
         {
             _informerTextPrefab = informerTextPrefab;
             _newGameCountdownSubscriber = newGameCountdownSubscriber;
@@ -57,7 +57,7 @@ namespace RudyAtkinson.Gameplay.View
 
         private void OnLeaveButtonClick()
         {
-            _leaveButtonClickPublisher?.Publish(new LeaveButtonClick());
+            _leaveButtonClickPublisher?.Publish(new LeaveButtonClickMessage());
         }
 
         private void OnNewGameStart(NewGameStart newGameStart)
@@ -66,7 +66,8 @@ namespace RudyAtkinson.Gameplay.View
             
             var text = CreateInformerText();
             
-            text.SetText($"{newGameStart.GameStarterMark} will play the first turn.");
+            var starterPlayerText = newGameStart.isStarterPlayer ? "You" : "Opponent";
+            text.SetText($"{starterPlayerText} will play the first turn.");
 
             UniTask.Delay(TimeSpan.FromSeconds(5)).AsAsyncUnitUniTask().ContinueWith(_ =>
             {

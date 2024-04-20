@@ -35,7 +35,7 @@ namespace RudyAtkinson.Scopes
             builder.RegisterEntryPoint<TileClick>();
             builder.RegisterEntryPoint<NewGameCountdown>();
             builder.RegisterEntryPoint<NewGameStart>();
-            builder.RegisterEntryPoint<LeaveButtonClick>();
+            builder.RegisterEntryPoint<LeaveButtonClickMessage>();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace RudyAtkinson.Gameplay.Message
 {
-    public class LeaveButtonClick
+    public class LeaveButtonClickMessage
     {
         
     }
