@@ -62,13 +62,15 @@ namespace RudyAtkinson.Gameplay.View
 
         private void OnNewGameStart(NewGameStart newGameStart)
         {
+            _newGameCountdownCancellationToken?.Cancel();
+            
             var text = CreateInformerText();
             
             text.SetText($"{newGameStart.GameStarterMark} will play the first turn.");
 
             UniTask.Delay(TimeSpan.FromSeconds(5)).AsAsyncUnitUniTask().ContinueWith(_ =>
             {
-                Destroy(text);
+                Destroy(text.gameObject);
             });
         }
         
@@ -83,7 +85,7 @@ namespace RudyAtkinson.Gameplay.View
             _newGameCountdownCancellationToken = new CancellationTokenSource();
             _newGameCountdownCancellationToken.Token.Register(() =>
             {
-                Destroy(text);
+                Destroy(text.gameObject);
             });
 
             UniTask.Delay(TimeSpan.FromSeconds(5), cancellationToken: new CancellationToken())
@@ -91,7 +93,7 @@ namespace RudyAtkinson.Gameplay.View
                 .AsAsyncUnitUniTask()
                 .ContinueWith(_ =>
                 {
-                    Destroy(text);
+                    Destroy(text.gameObject);
                 });
         }
 
