@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Epic.OnlineServices.RTC;
 using FishNet.Connection;
-using FishNet.Managing;
 using FishNet.Object;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
+using RudyAtkinson.Gameplay.Message;
 using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
@@ -26,6 +25,10 @@ namespace RudyAtkinson.Gameplay.Controller
         
         private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
         private IPublisher<NewGameStart> _newGameStartPublisher;
+        private IPublisher<UpdateWinScoresMessage> _updateWinScoresPublisher;
+        private IPublisher<ShowWinConditionMessage> _showWinConditionPublisher;
+        private IPublisher<UpdateTurnInfoMessage> _updateTurnInfoPublisher;
+        private IPublisher<NotYourTurnMessage> _notYourTurnPublisher;
 
         private ISubscriber<TileClick> _tileClickSubscriber;
 
@@ -37,7 +40,11 @@ namespace RudyAtkinson.Gameplay.Controller
             GameplayRepository gameplayRepository,
             IPublisher<NewGameCountdown> newGameCountdownPublisher,
             IPublisher<NewGameStart> newGameStartPublisher,
-            FishyEOS fishyEos)
+            FishyEOS fishyEos,
+            IPublisher<UpdateWinScoresMessage> updateWinScoresPublisher,
+            IPublisher<ShowWinConditionMessage> showWinConditionPublisher,
+            IPublisher<UpdateTurnInfoMessage> updateTurnInfoPublisher,
+            IPublisher<NotYourTurnMessage> notYourTurnPublisher)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
@@ -45,6 +52,10 @@ namespace RudyAtkinson.Gameplay.Controller
             _newGameCountdownPublisher = newGameCountdownPublisher;
             _newGameStartPublisher = newGameStartPublisher;
             _fishyEos = fishyEos;
+            _updateWinScoresPublisher = updateWinScoresPublisher;
+            _showWinConditionPublisher = showWinConditionPublisher;
+            _updateTurnInfoPublisher = updateTurnInfoPublisher;
+            _notYourTurnPublisher = notYourTurnPublisher;
         }
 
         private void OnEnable()
@@ -148,7 +159,7 @@ namespace RudyAtkinson.Gameplay.Controller
             }
             else
             {
-                Observers_TurnChanged(nextTurnMark);
+                Observers_TurnChanged(!isHost);
             }
         }
         
@@ -232,45 +243,49 @@ namespace RudyAtkinson.Gameplay.Controller
         [TargetRpc]
         private void Target_NotYourTurn(NetworkConnection conn)
         {
-            // TODO: Inform the player
-            Debug.Log("[Target] Not my turn yet!");
+            _notYourTurnPublisher?.Publish(new NotYourTurnMessage());
         }
         #endregion
 
         #region ObserversRPC
         [ObserversRpc]
-        private void Observers_TurnChanged(char turnMark)
+        private void Observers_TurnChanged(bool isHostTurn)
         {
-            // TODO: Inform the player
-            Debug.Log($"[Observer] Turn changed: {turnMark}");
+            _updateTurnInfoPublisher?.Publish(new UpdateTurnInfoMessage() {IsPlayersTurn = isHostTurn == IsHostInitialized});
         }
 
         [ObserversRpc]
-        private void Observers_PlayerWin(bool isHostWin, Dictionary<char, int> winDict)
+        private void Observers_PlayerWin(bool hasHostWon, Dictionary<char, int> winDict)
         {
-            var playerMark = isHostWin ? 'X' : 'O';
-            Debug.Log($"[Observer] Player {playerMark} Won!");
+            _showWinConditionPublisher?.Publish(new ShowWinConditionMessage() {HasPlayerWon = hasHostWon == IsHostInitialized});
+
+            var playerMark = IsHostInitialized ? 'X' : 'O';
+            var opponentMark = IsHostInitialized ? 'O' : 'X';
+            var playerWinCount = winDict[playerMark];
+            var opponentWinCount = winDict[opponentMark];
             
-            foreach (var kvp in winDict)
+            _updateWinScoresPublisher?.Publish(new UpdateWinScoresMessage()
             {
-                Debug.Log($"{kvp.Key}: {kvp.Value}");
-            }
+                PlayerWinCount = playerWinCount, 
+                OpponentWinCount = opponentWinCount
+            });
         }
 
         [ObserversRpc]
         private void Observers_NewGameCountdown(int countdown)
         {
-            Debug.Log($"[Observer] Observers_NewGameCountdown Countdown: {countdown}");
-            
             _newGameCountdownPublisher?.Publish(new NewGameCountdown() {Countdown = countdown});
+            
+            Debug.Log($"[Observer] Observers_NewGameCountdown Countdown: {countdown}");
         }
 
         [ObserversRpc]
         private void Observers_NewGameStart(char gameStarterMark)
         {
-            Debug.Log($"[Observer] Observers_NewGameStart gameStarterMark: {gameStarterMark}");
+            var isMarkHost = gameStarterMark == 'X';
+            _newGameStartPublisher?.Publish(new NewGameStart() {IsPlayerStart = isMarkHost == IsHostInitialized});
             
-            _newGameStartPublisher?.Publish(new NewGameStart() {GameStarterMark = gameStarterMark});
+            Debug.Log($"[Observer] Observers_NewGameStart gameStarterMark: {gameStarterMark}");
         }
         #endregion
     }
