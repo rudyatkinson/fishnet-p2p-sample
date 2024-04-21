@@ -2,6 +2,6 @@
 {
     public class ShowWinConditionMessage
     {
-        
+        public bool HasPlayerWon;
     }
 }

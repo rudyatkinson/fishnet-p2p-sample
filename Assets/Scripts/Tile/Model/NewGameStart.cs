@@ -2,6 +2,6 @@
 {
     public class NewGameStart
     {
-        public char GameStarterMark;
+        public bool IsPlayerStart;
     }
 }

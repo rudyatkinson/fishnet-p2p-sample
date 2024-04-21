@@ -2,6 +2,6 @@
 {
     public class UpdateTurnInfoMessage
     {
-        
+        public bool IsPlayersTurn;
     }
 }
