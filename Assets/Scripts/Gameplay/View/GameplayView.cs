@@ -22,7 +22,7 @@ namespace RudyAtkinson.Gameplay.View
 
         private IPublisher<LeaveButtonClickMessage> _leaveButtonClickPublisher;
         
-        private ISubscriber<NewGameCountdown> _newGameCountdownSubscriber;
+        private ISubscriber<NewGameCountdownMessage> _newGameCountdownSubscriber;
         private ISubscriber<NewGameStartMessage> _newGameStartSubscriber;
         private ISubscriber<ShowWinConditionMessage> _showWinConditionSubscriber;
         private ISubscriber<UpdateTurnInfoMessage> _updateTurnInfoSubscriber;
@@ -38,7 +38,7 @@ namespace RudyAtkinson.Gameplay.View
         
         [Inject]
         private void Construct(TMP_Text informerTextPrefab,
-            ISubscriber<NewGameCountdown> newGameCountdownSubscriber,
+            ISubscriber<NewGameCountdownMessage> newGameCountdownSubscriber,
             ISubscriber<NewGameStartMessage> newGameStartSubscriber,
             IPublisher<LeaveButtonClickMessage> leaveButtonClickPublisher,
             ISubscriber<ShowWinConditionMessage> showWinConditionSubscriber,
@@ -115,13 +115,13 @@ namespace RudyAtkinson.Gameplay.View
                 });
         }
         
-        private void OnNewGameCountdown(NewGameCountdown newGameCountdown)
+        private void OnNewGameCountdown(NewGameCountdownMessage newGameCountdownMessage)
         {
             _newGameCountdownCTS?.Cancel();
             
             var text = CreateInformerText();
             
-            text.SetText($"New Game starting in {newGameCountdown.Countdown}");
+            text.SetText($"New Game starting in {newGameCountdownMessage.Countdown}");
 
             _newGameCountdownCTS = new CancellationTokenSource();
             _newGameCountdownCTS.Token.Register(() =>

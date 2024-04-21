@@ -23,7 +23,7 @@ namespace RudyAtkinson.Gameplay.Controller
         private GameplayRepository _gameplayRepository;
         private FishyEOS _fishyEos;
         
-        private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
+        private IPublisher<NewGameCountdownMessage> _newGameCountdownPublisher;
         private IPublisher<NewGameStartMessage> _newGameStartPublisher;
         private IPublisher<UpdateWinScoresMessage> _updateWinScoresPublisher;
         private IPublisher<ShowWinConditionMessage> _showWinConditionPublisher;
@@ -38,7 +38,7 @@ namespace RudyAtkinson.Gameplay.Controller
         private void Construct(ISubscriber<TileClick> tileClickSubscriber,
             TileRepository tileRepository,
             GameplayRepository gameplayRepository,
-            IPublisher<NewGameCountdown> newGameCountdownPublisher,
+            IPublisher<NewGameCountdownMessage> newGameCountdownPublisher,
             IPublisher<NewGameStartMessage> newGameStartPublisher,
             FishyEOS fishyEos,
             IPublisher<UpdateWinScoresMessage> updateWinScoresPublisher,
@@ -274,7 +274,7 @@ namespace RudyAtkinson.Gameplay.Controller
         [ObserversRpc]
         private void Observers_NewGameCountdown(int countdown)
         {
-            _newGameCountdownPublisher?.Publish(new NewGameCountdown() {Countdown = countdown});
+            _newGameCountdownPublisher?.Publish(new NewGameCountdownMessage() {Countdown = countdown});
             
             Debug.Log($"[Observer] Observers_NewGameCountdown Countdown: {countdown}");
         }
