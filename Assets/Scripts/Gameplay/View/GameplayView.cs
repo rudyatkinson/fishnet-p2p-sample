@@ -23,7 +23,7 @@ namespace RudyAtkinson.Gameplay.View
         private IPublisher<LeaveButtonClickMessage> _leaveButtonClickPublisher;
         
         private ISubscriber<NewGameCountdown> _newGameCountdownSubscriber;
-        private ISubscriber<NewGameStart> _newGameStartSubscriber;
+        private ISubscriber<NewGameStartMessage> _newGameStartSubscriber;
         private ISubscriber<ShowWinConditionMessage> _showWinConditionSubscriber;
         private ISubscriber<UpdateTurnInfoMessage> _updateTurnInfoSubscriber;
         private ISubscriber<UpdateWinScoresMessage> _updateWinScoresSubscriber;
@@ -39,7 +39,7 @@ namespace RudyAtkinson.Gameplay.View
         [Inject]
         private void Construct(TMP_Text informerTextPrefab,
             ISubscriber<NewGameCountdown> newGameCountdownSubscriber,
-            ISubscriber<NewGameStart> newGameStartSubscriber,
+            ISubscriber<NewGameStartMessage> newGameStartSubscriber,
             IPublisher<LeaveButtonClickMessage> leaveButtonClickPublisher,
             ISubscriber<ShowWinConditionMessage> showWinConditionSubscriber,
             ISubscriber<UpdateTurnInfoMessage> updateTurnInfoSubscriber,
@@ -88,14 +88,14 @@ namespace RudyAtkinson.Gameplay.View
             _leaveButtonClickPublisher?.Publish(new LeaveButtonClickMessage());
         }
 
-        private void OnNewGameStart(NewGameStart newGameStart)
+        private void OnNewGameStart(NewGameStartMessage newGameStartMessage)
         {
             _newGameCountdownCTS?.Cancel();
             _newGameStartCTS?.Cancel();
             
             var text = CreateInformerText();
             
-            var starterPlayerText = newGameStart.IsPlayerStart ? "You" : "Opponent";
+            var starterPlayerText = newGameStartMessage.IsPlayerStart ? "You" : "Opponent";
             text.SetText($"{starterPlayerText} will play the first turn.");
             
             _newGameStartCTS = new CancellationTokenSource();

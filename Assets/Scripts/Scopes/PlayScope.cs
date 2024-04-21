@@ -34,7 +34,7 @@ namespace RudyAtkinson.Scopes
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClick>();
             builder.RegisterEntryPoint<NewGameCountdown>();
-            builder.RegisterEntryPoint<NewGameStart>();
+            builder.RegisterEntryPoint<NewGameStartMessage>();
             builder.RegisterEntryPoint<LeaveButtonClickMessage>();
             builder.RegisterEntryPoint<UpdateWinScoresMessage>();
             builder.RegisterEntryPoint<ShowWinConditionMessage>();

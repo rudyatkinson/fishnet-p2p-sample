@@ -24,7 +24,7 @@ namespace RudyAtkinson.Gameplay.Controller
         private FishyEOS _fishyEos;
         
         private IPublisher<NewGameCountdown> _newGameCountdownPublisher;
-        private IPublisher<NewGameStart> _newGameStartPublisher;
+        private IPublisher<NewGameStartMessage> _newGameStartPublisher;
         private IPublisher<UpdateWinScoresMessage> _updateWinScoresPublisher;
         private IPublisher<ShowWinConditionMessage> _showWinConditionPublisher;
         private IPublisher<UpdateTurnInfoMessage> _updateTurnInfoPublisher;
@@ -39,7 +39,7 @@ namespace RudyAtkinson.Gameplay.Controller
             TileRepository tileRepository,
             GameplayRepository gameplayRepository,
             IPublisher<NewGameCountdown> newGameCountdownPublisher,
-            IPublisher<NewGameStart> newGameStartPublisher,
+            IPublisher<NewGameStartMessage> newGameStartPublisher,
             FishyEOS fishyEos,
             IPublisher<UpdateWinScoresMessage> updateWinScoresPublisher,
             IPublisher<ShowWinConditionMessage> showWinConditionPublisher,
@@ -283,7 +283,7 @@ namespace RudyAtkinson.Gameplay.Controller
         private void Observers_NewGameStart(char gameStarterMark)
         {
             var isMarkHost = gameStarterMark == 'X';
-            _newGameStartPublisher?.Publish(new NewGameStart() {IsPlayerStart = isMarkHost == IsHostInitialized});
+            _newGameStartPublisher?.Publish(new NewGameStartMessage() {IsPlayerStart = isMarkHost == IsHostInitialized});
             
             Debug.Log($"[Observer] Observers_NewGameStart gameStarterMark: {gameStarterMark}");
         }
