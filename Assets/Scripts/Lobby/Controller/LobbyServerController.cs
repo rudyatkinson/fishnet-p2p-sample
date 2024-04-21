@@ -162,8 +162,8 @@ namespace RudyAtkinson.Lobby.Controller
                 countdown--;
             }
             
-            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneNames: new []{"PlayScene"}));
-            _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneNames: new []{"LobbyScene"}));
+            _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "PlayScene"));
+            _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: "LobbyScene"));
         }
         
         [ObserversRpc]

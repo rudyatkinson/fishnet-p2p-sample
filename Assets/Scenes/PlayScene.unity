@@ -376,7 +376,7 @@ MonoBehaviour:
   _playerScoreText: {fileID: 700930308}
   _opponentScoreText: {fileID: 2009838481}
   _informerTextParent: {fileID: 981460400}
-  _leaveButton: {fileID: 660430496}
+  _disconnectButton: {fileID: 660430496}
 --- !u!1001 &182210367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -921,7 +921,7 @@ GameObject:
   - component: {fileID: 660430497}
   - component: {fileID: 660430496}
   m_Layer: 5
-  m_Name: LeaveButton
+  m_Name: DisconnectButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

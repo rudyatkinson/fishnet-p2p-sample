@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using Epic.OnlineServices;
 using FishNet.Managing;
+using FishNet.Plugins.FishyEOS.Util;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
@@ -42,7 +45,13 @@ namespace RudyAtkinson.Lobby.View
 
         private void Awake()
         {
-            PlayerPrefs.SetString("rudyatkinson-player-name", "Player");
+            if (!PlayerPrefs.HasKey("rudyatkinson-player-name"))
+            {
+                PlayerPrefs.SetString("rudyatkinson-player-name", "Player");
+            }
+
+            StartCoroutine(EOSLoginCoroutine());
+            
         }
 
         private void OnEnable()
@@ -64,9 +73,42 @@ namespace RudyAtkinson.Lobby.View
             
             _messageDisposables?.Dispose();
         }
+        
+        private IEnumerator EOSLoginCoroutine()
+        {
+            yield return new AuthData().Connect(out var authDataLogin);
+            
+            var nullableLoginCallback = authDataLogin.loginCallbackInfo;
+            if (!nullableLoginCallback.HasValue)
+            {
+                _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
+
+                yield break;
+            }
+            
+            var loginCallback = nullableLoginCallback.Value;
+            
+            Debug.Log($"EOS Login Result: {loginCallback.ResultCode}");
+
+            _lobbyRepository.EOSLoginResult = loginCallback.ResultCode;
+
+            _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
+        }
 
         private void OnGUI()
         {
+            if (!_lobbyRepository.TriedToLoginEOSAtInitialTime)
+            {
+                DrawLoggingInEOSUI();
+                return;
+            }
+            
+            if (_lobbyRepository.EOSLoginResult != Result.Success)
+            {
+                DrawLoginErrorUI();
+                return;
+            }
+            
             if (_lobbyRepository.LocalConnectionState is LocalConnectionState.Stopped)
             {
                 DrawHostAndJoinUI();
@@ -88,6 +130,26 @@ namespace RudyAtkinson.Lobby.View
             {
                 DrawAllLobbyPlayersReadyCountdownUI();
             }
+        }
+
+        private void DrawLoggingInEOSUI()
+        {
+            GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - _height * .5f, _width, _height));
+            GUILayout.Label("Logging in EOS...", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.EndArea();
+        }
+        
+        private void DrawLoginErrorUI()
+        {
+            GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - _height * .5f, _width, _height));
+            GUILayout.Label($"Encountered an error during login, {_lobbyRepository.EOSLoginResult}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.Space(50);
+            if (GUILayout.Button("Try Again", new GUIStyle("button") { fontSize = 42 }, GUILayout.Width(750), GUILayout.Height(75)))
+            {
+                _lobbyRepository.TriedToLoginEOSAtInitialTime = false;
+                StartCoroutine(EOSLoginCoroutine());
+            }
+            GUILayout.EndArea();
         }
 
         private void DrawHostAndJoinUI()
