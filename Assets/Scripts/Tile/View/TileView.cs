@@ -2,6 +2,7 @@ using System;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using MessagePipe;
+using RudyAtkinson.Tile.Message;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using TMPro;

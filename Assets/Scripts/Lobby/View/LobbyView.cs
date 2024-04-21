@@ -3,7 +3,7 @@ using FishNet.Managing;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
-using RudyAtkinson.Lobby.Model;
+using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.Lobby.Repository;
 using UnityEngine;
 using VContainer;
@@ -19,7 +19,7 @@ namespace RudyAtkinson.Lobby.View
         private FishyEOS _fishyEos;
         private LobbyRepository _lobbyRepository;
 
-        private ISubscriber<AllLobbyPlayersReadyCountdown> _allLobbyPlayersReadyCountdownSubscriber;
+        private ISubscriber<AllLobbyPlayersReadyCountdownMessage> _allLobbyPlayersReadyCountdownSubscriber;
 
         private IDisposable _messageDisposables;
         
@@ -31,7 +31,7 @@ namespace RudyAtkinson.Lobby.View
         public void Construct(LobbyRepository lobbyRepository,
             NetworkManager networkManager,
             FishyEOS fishyEos,
-            ISubscriber<AllLobbyPlayersReadyCountdown> allLobbyPlayersReadyCountdownSubscriber)
+            ISubscriber<AllLobbyPlayersReadyCountdownMessage> allLobbyPlayersReadyCountdownSubscriber)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
@@ -52,7 +52,7 @@ namespace RudyAtkinson.Lobby.View
             var allLobbyPlayersReadyCountdownDisposable = _allLobbyPlayersReadyCountdownSubscriber.Subscribe(
                 obj =>
                 {
-                    _lobbyRepository.AllLobbyPlayersReadyCountdownData = obj;
+                    _lobbyRepository.AllLobbyPlayersReadyCountdownMessageData = obj;
                 });
             
             _messageDisposables = DisposableBag.Create(allLobbyPlayersReadyCountdownDisposable);
@@ -84,7 +84,7 @@ namespace RudyAtkinson.Lobby.View
                 DrawConnectionStartedUI();
             }
 
-            if (_lobbyRepository.AllLobbyPlayersReadyCountdownData.Enabled)
+            if (_lobbyRepository.AllLobbyPlayersReadyCountdownMessageData.Enabled)
             {
                 DrawAllLobbyPlayersReadyCountdownUI();
             }
@@ -153,7 +153,7 @@ namespace RudyAtkinson.Lobby.View
         {
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .9f - _height * .5f, _width, _height));
             
-            GUILayout.Label($"Starting in {_lobbyRepository.AllLobbyPlayersReadyCountdownData.Countdown}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.Label($"Starting in {_lobbyRepository.AllLobbyPlayersReadyCountdownMessageData.Countdown}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
 
             GUILayout.EndArea();
         }

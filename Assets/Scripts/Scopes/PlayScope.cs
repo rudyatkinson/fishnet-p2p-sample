@@ -3,6 +3,7 @@ using RudyAtkinson.Gameplay.Controller;
 using RudyAtkinson.Gameplay.Message;
 using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Gameplay.View;
+using RudyAtkinson.Tile.Message;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;

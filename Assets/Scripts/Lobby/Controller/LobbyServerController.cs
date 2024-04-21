@@ -8,7 +8,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
-using RudyAtkinson.Lobby.Model;
+using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.LobbyPlayer.Model;
 using RudyAtkinson.LobbyPlayer.View;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace RudyAtkinson.Lobby.Controller
         private FishyEOS _fishyEos;
         private LobbyPlayerViewFactory _lobbyPlayerViewFactory;
 
-        private IPublisher<AllLobbyPlayersReadyCountdown> _allLobbyPlayersReadyCountdownPublisher;
+        private IPublisher<AllLobbyPlayersReadyCountdownMessage> _allLobbyPlayersReadyCountdownPublisher;
         
         private ISubscriber<LobbyPlayerReadyMessage> _lobbyPlayerReadySubscriber;
 
@@ -37,7 +37,7 @@ namespace RudyAtkinson.Lobby.Controller
             FishyEOS fishyEos,
             LobbyPlayerViewFactory lobbyPlayerViewFactory,
             ISubscriber<LobbyPlayerReadyMessage> lobbyPlayerReadySubscriber,
-            IPublisher<AllLobbyPlayersReadyCountdown> allLobbyPlayersReadyCountdownPublisher)
+            IPublisher<AllLobbyPlayersReadyCountdownMessage> allLobbyPlayersReadyCountdownPublisher)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
@@ -169,7 +169,7 @@ namespace RudyAtkinson.Lobby.Controller
         [ObserversRpc]
         private void PublishAllLobbyPlayersReadyCountdown(bool isEnabled, int countdown)
         {
-            _allLobbyPlayersReadyCountdownPublisher.Publish(new AllLobbyPlayersReadyCountdown(isEnabled, countdown));
+            _allLobbyPlayersReadyCountdownPublisher.Publish(new AllLobbyPlayersReadyCountdownMessage(isEnabled, countdown));
         }
 
         #endregion

@@ -1,6 +1,6 @@
 ﻿using RudyAtkinson.Tile.View;
 
-namespace RudyAtkinson.Tile.Model
+namespace RudyAtkinson.Tile.Message
 {
     public class TileClickMessage
     {

@@ -1,6 +1,6 @@
 using MessagePipe;
 using RudyAtkinson.Lobby.Controller;
-using RudyAtkinson.Lobby.Model;
+using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
 using RudyAtkinson.LobbyPlayer.Model;
@@ -30,7 +30,7 @@ namespace RudyAtkinson.Scopes
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<LobbyPlayerReadyMessage>();
-            builder.RegisterEntryPoint<AllLobbyPlayersReadyCountdown>();
+            builder.RegisterEntryPoint<AllLobbyPlayersReadyCountdownMessage>();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using FishNet.Transporting;
-using RudyAtkinson.Lobby.Model;
+using RudyAtkinson.Lobby.Message;
 
 namespace RudyAtkinson.Lobby.Repository
 {
@@ -7,6 +7,6 @@ namespace RudyAtkinson.Lobby.Repository
     {
         public string Address { get; set; }
         public LocalConnectionState LocalConnectionState { get; set; }
-        public AllLobbyPlayersReadyCountdown AllLobbyPlayersReadyCountdownData { get; set; } = new(false);
+        public AllLobbyPlayersReadyCountdownMessage AllLobbyPlayersReadyCountdownMessageData { get; set; } = new(false);
     }
 }

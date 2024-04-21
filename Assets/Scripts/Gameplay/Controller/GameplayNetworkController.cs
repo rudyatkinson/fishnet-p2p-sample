@@ -9,6 +9,7 @@ using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
 using RudyAtkinson.Gameplay.Message;
 using RudyAtkinson.Gameplay.Repository;
+using RudyAtkinson.Tile.Message;
 using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
