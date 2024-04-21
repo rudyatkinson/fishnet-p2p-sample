@@ -4,7 +4,6 @@ using RudyAtkinson.Gameplay.Message;
 using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Gameplay.View;
 using RudyAtkinson.Tile.Message;
-using RudyAtkinson.Tile.Model;
 using RudyAtkinson.Tile.Repository;
 using RudyAtkinson.Tile.View;
 using TMPro;
@@ -30,13 +29,14 @@ namespace RudyAtkinson.Scopes
 
             builder.Register<TileRepository>(Lifetime.Singleton);
             builder.Register<GameplayRepository>(Lifetime.Singleton);
+            
             builder.Register<GameplayController>(Lifetime.Singleton).AsImplementedInterfaces();
 
             builder.RegisterMessagePipe();
             builder.RegisterEntryPoint<TileClickMessage>();
             builder.RegisterEntryPoint<NewGameCountdownMessage>();
             builder.RegisterEntryPoint<NewGameStartMessage>();
-            builder.RegisterEntryPoint<LeaveButtonClickMessage>();
+            builder.RegisterEntryPoint<DisconnectButtonClickMessage>();
             builder.RegisterEntryPoint<UpdateWinScoresMessage>();
             builder.RegisterEntryPoint<ShowWinConditionMessage>();
             builder.RegisterEntryPoint<UpdateTurnInfoMessage>();

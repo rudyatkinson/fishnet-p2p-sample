@@ -10,22 +10,22 @@ namespace RudyAtkinson.Gameplay.Controller
     {
         private readonly NetworkManager _networkManager;
         
-        private readonly ISubscriber<LeaveButtonClickMessage> _leaveButtonClickSubscriber;
+        private readonly ISubscriber<DisconnectButtonClickMessage> _disconnectButtonClickSubscriber;
 
         private IDisposable _subscriberDisposables;
         
-        public GameplayController(ISubscriber<LeaveButtonClickMessage> leaveButtonClickSubscriber,
+        public GameplayController(ISubscriber<DisconnectButtonClickMessage> disconnectButtonClickSubscriber,
             NetworkManager networkManager)
         {
             _networkManager = networkManager;
-            _leaveButtonClickSubscriber = leaveButtonClickSubscriber;
+            _disconnectButtonClickSubscriber = disconnectButtonClickSubscriber;
         }
         
         public void Start()
         {
-            var leaveButtonClickSubscriberDisposable = _leaveButtonClickSubscriber.Subscribe(OnLeaveButtonClick);
+            var disconnectButtonClickSubscriberDisposable = _disconnectButtonClickSubscriber.Subscribe(OnDisconnectButtonClick);
 
-            _subscriberDisposables = DisposableBag.Create(leaveButtonClickSubscriberDisposable);
+            _subscriberDisposables = DisposableBag.Create(disconnectButtonClickSubscriberDisposable);
         }
 
         ~GameplayController()
@@ -33,7 +33,7 @@ namespace RudyAtkinson.Gameplay.Controller
             _subscriberDisposables?.Dispose();
         }
 
-        private void OnLeaveButtonClick(LeaveButtonClickMessage leaveButtonClickMessage)
+        private void OnDisconnectButtonClick(DisconnectButtonClickMessage args)
         {
             if (_networkManager.IsHostStarted)
             {

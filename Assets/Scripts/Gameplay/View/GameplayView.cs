@@ -3,7 +3,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using RudyAtkinson.Gameplay.Message;
-using RudyAtkinson.Tile.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,11 +15,11 @@ namespace RudyAtkinson.Gameplay.View
         [SerializeField] private TMP_Text _playerScoreText;
         [SerializeField] private TMP_Text _opponentScoreText;
         [SerializeField] private Transform _informerTextParent;
-        [SerializeField] private Button _leaveButton;
+        [SerializeField] private Button _disconnectButton;
 
         private TMP_Text _informerTextPrefab;
 
-        private IPublisher<LeaveButtonClickMessage> _leaveButtonClickPublisher;
+        private IPublisher<DisconnectButtonClickMessage> _disconnectButtonClickPublisher;
         
         private ISubscriber<NewGameCountdownMessage> _newGameCountdownSubscriber;
         private ISubscriber<NewGameStartMessage> _newGameStartSubscriber;
@@ -40,7 +39,7 @@ namespace RudyAtkinson.Gameplay.View
         private void Construct(TMP_Text informerTextPrefab,
             ISubscriber<NewGameCountdownMessage> newGameCountdownSubscriber,
             ISubscriber<NewGameStartMessage> newGameStartSubscriber,
-            IPublisher<LeaveButtonClickMessage> leaveButtonClickPublisher,
+            IPublisher<DisconnectButtonClickMessage> disconnectButtonClickPublisher,
             ISubscriber<ShowWinConditionMessage> showWinConditionSubscriber,
             ISubscriber<UpdateTurnInfoMessage> updateTurnInfoSubscriber,
             ISubscriber<UpdateWinScoresMessage> updateWinScoresSubscriber,
@@ -49,7 +48,7 @@ namespace RudyAtkinson.Gameplay.View
             _informerTextPrefab = informerTextPrefab;
             _newGameCountdownSubscriber = newGameCountdownSubscriber;
             _newGameStartSubscriber = newGameStartSubscriber;
-            _leaveButtonClickPublisher = leaveButtonClickPublisher;
+            _disconnectButtonClickPublisher = disconnectButtonClickPublisher;
             _showWinConditionSubscriber = showWinConditionSubscriber;
             _updateTurnInfoSubscriber = updateTurnInfoSubscriber;
             _updateWinScoresSubscriber = updateWinScoresSubscriber;
@@ -58,7 +57,7 @@ namespace RudyAtkinson.Gameplay.View
 
         private void OnEnable()
         {
-            _leaveButton.onClick.AddListener(OnLeaveButtonClick);
+            _disconnectButton.onClick.AddListener(OnDisconnectButtonClick);
             
             var newGameCountdownDisposable = _newGameCountdownSubscriber.Subscribe(OnNewGameCountdown);
             var newGameStartDisposable = _newGameStartSubscriber.Subscribe(OnNewGameStart);
@@ -78,14 +77,15 @@ namespace RudyAtkinson.Gameplay.View
 
         private void OnDisable()
         {
-            _leaveButton.onClick.RemoveListener(OnLeaveButtonClick);
+            _disconnectButton.onClick.RemoveListener(OnDisconnectButtonClick);
 
             _subscriberDisposables?.Dispose();
         }
+        
 
-        private void OnLeaveButtonClick()
+        private void OnDisconnectButtonClick()
         {
-            _leaveButtonClickPublisher?.Publish(new LeaveButtonClickMessage());
+            _disconnectButtonClickPublisher?.Publish(new DisconnectButtonClickMessage());
         }
 
         private void OnNewGameStart(NewGameStartMessage newGameStartMessage)
