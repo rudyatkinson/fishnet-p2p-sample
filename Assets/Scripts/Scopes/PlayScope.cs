@@ -36,6 +36,10 @@ namespace RudyAtkinson.Scopes
             builder.RegisterEntryPoint<NewGameCountdown>();
             builder.RegisterEntryPoint<NewGameStart>();
             builder.RegisterEntryPoint<LeaveButtonClickMessage>();
+            builder.RegisterEntryPoint<UpdateWinScoresMessage>();
+            builder.RegisterEntryPoint<ShowWinConditionMessage>();
+            builder.RegisterEntryPoint<UpdateTurnInfoMessage>();
+            builder.RegisterEntryPoint<NotYourTurnMessage>();
         }
     }
 }
