@@ -8,11 +8,11 @@ namespace RudyAtkinson.LobbyPlayer.View
     public class LobbyPlayerViewFactory
     {
         private LobbyPlayerView _prefab;
-        private IPublisher<LobbyPlayerReady> _lobbyPlayerReady;
+        private IPublisher<LobbyPlayerReadyMessage> _lobbyPlayerReady;
         
         [Inject]
         public LobbyPlayerViewFactory(LobbyPlayerView prefab, 
-            IPublisher<LobbyPlayerReady> lobbyPlayerReady)
+            IPublisher<LobbyPlayerReadyMessage> lobbyPlayerReady)
         {
             _prefab = prefab;
             _lobbyPlayerReady = lobbyPlayerReady;

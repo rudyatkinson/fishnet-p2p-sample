@@ -24,7 +24,7 @@ namespace RudyAtkinson.Lobby.Controller
 
         private IPublisher<AllLobbyPlayersReadyCountdown> _allLobbyPlayersReadyCountdownPublisher;
         
-        private ISubscriber<LobbyPlayerReady> _lobbyPlayerReadySubscriber;
+        private ISubscriber<LobbyPlayerReadyMessage> _lobbyPlayerReadySubscriber;
 
         private IDisposable _messageSubscriptionCombinedDisposable;
 
@@ -36,7 +36,7 @@ namespace RudyAtkinson.Lobby.Controller
         private void Construct(NetworkManager networkManager,
             FishyEOS fishyEos,
             LobbyPlayerViewFactory lobbyPlayerViewFactory,
-            ISubscriber<LobbyPlayerReady> lobbyPlayerReadySubscriber,
+            ISubscriber<LobbyPlayerReadyMessage> lobbyPlayerReadySubscriber,
             IPublisher<AllLobbyPlayersReadyCountdown> allLobbyPlayersReadyCountdownPublisher)
         {
             _networkManager = networkManager;

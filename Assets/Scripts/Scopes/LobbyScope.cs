@@ -29,7 +29,7 @@ namespace RudyAtkinson.Scopes
             builder.Register<LobbyPlayerViewFactory>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();
-            builder.RegisterEntryPoint<LobbyPlayerReady>();
+            builder.RegisterEntryPoint<LobbyPlayerReadyMessage>();
             builder.RegisterEntryPoint<AllLobbyPlayersReadyCountdown>();
         }
     }

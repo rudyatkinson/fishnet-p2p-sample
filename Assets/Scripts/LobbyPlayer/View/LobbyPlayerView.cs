@@ -18,7 +18,7 @@ namespace RudyAtkinson.LobbyPlayer.View
         [SerializeField] private TMP_Text _playerNameText;
         [SerializeField] private Toggle _readyToggle;
 
-        private IPublisher<LobbyPlayerReady> _lobbyPlayerReady;
+        private IPublisher<LobbyPlayerReadyMessage> _lobbyPlayerReady;
         
         #region Client
 
@@ -72,7 +72,7 @@ namespace RudyAtkinson.LobbyPlayer.View
         
         #region Server
         
-        public void SetDependencies(IPublisher<LobbyPlayerReady> lobbyPlayerReady)
+        public void SetDependencies(IPublisher<LobbyPlayerReadyMessage> lobbyPlayerReady)
         {
             _lobbyPlayerReady = lobbyPlayerReady;
         }
@@ -95,7 +95,7 @@ namespace RudyAtkinson.LobbyPlayer.View
             _ready.Value = isReady;
             _readyToggle.isOn = isReady;
             
-            _lobbyPlayerReady?.Publish(new LobbyPlayerReady());
+            _lobbyPlayerReady?.Publish(new LobbyPlayerReadyMessage());
         }
 
         #endregion
