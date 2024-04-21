@@ -32,7 +32,7 @@ namespace RudyAtkinson.Scopes
             builder.Register<GameplayController>(Lifetime.Singleton).AsImplementedInterfaces();
 
             builder.RegisterMessagePipe();
-            builder.RegisterEntryPoint<TileClick>();
+            builder.RegisterEntryPoint<TileClickMessage>();
             builder.RegisterEntryPoint<NewGameCountdownMessage>();
             builder.RegisterEntryPoint<NewGameStartMessage>();
             builder.RegisterEntryPoint<LeaveButtonClickMessage>();

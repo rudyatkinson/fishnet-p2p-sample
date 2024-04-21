@@ -23,11 +23,11 @@ namespace RudyAtkinson.Tile.View
         [SerializeField] private Color _baseEvenColor;
         [SerializeField] private TMP_Text _debugText;
 
-        private IPublisher<TileClick> _tileClick;
+        private IPublisher<TileClickMessage> _tileClick;
         private TileRepository _tileRepository;
         
         [Inject]
-        private void Construct(IPublisher<TileClick> tileClick,
+        private void Construct(IPublisher<TileClickMessage> tileClick,
             TileRepository tileRepository)
         {
             _tileClick = tileClick;
@@ -78,7 +78,7 @@ namespace RudyAtkinson.Tile.View
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            _tileClick.Publish(new TileClick() {Tile = this});
+            _tileClick.Publish(new TileClickMessage() {Tile = this});
             
             SetBaseColor();
         }

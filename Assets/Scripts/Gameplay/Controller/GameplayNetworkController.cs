@@ -30,12 +30,12 @@ namespace RudyAtkinson.Gameplay.Controller
         private IPublisher<UpdateTurnInfoMessage> _updateTurnInfoPublisher;
         private IPublisher<NotYourTurnMessage> _notYourTurnPublisher;
 
-        private ISubscriber<TileClick> _tileClickSubscriber;
+        private ISubscriber<TileClickMessage> _tileClickSubscriber;
 
         private IDisposable _subscriberDisposables;
         
         [Inject]
-        private void Construct(ISubscriber<TileClick> tileClickSubscriber,
+        private void Construct(ISubscriber<TileClickMessage> tileClickSubscriber,
             TileRepository tileRepository,
             GameplayRepository gameplayRepository,
             IPublisher<NewGameCountdownMessage> newGameCountdownPublisher,
@@ -79,7 +79,7 @@ namespace RudyAtkinson.Gameplay.Controller
 
         #region Server Logic
         [ServerRpc(RequireOwnership = false)]
-        private void Server_OnTileClick(TileClick tileClick, NetworkConnection conn = null)
+        private void Server_OnTileClick(TileClickMessage tileClickMessage, NetworkConnection conn = null)
         {
             if (_gameplayRepository.GetPlayerInputLocked())
             {
@@ -92,7 +92,7 @@ namespace RudyAtkinson.Gameplay.Controller
             var isHost = conn.IsHost;
             var mark = isHost ? hostMark : opponentMark;
 
-            var tile = tileClick.Tile;
+            var tile = tileClickMessage.Tile;
             var tileModel = tile.TileModel.Value;
             var tileMark = tileModel.Mark;
 

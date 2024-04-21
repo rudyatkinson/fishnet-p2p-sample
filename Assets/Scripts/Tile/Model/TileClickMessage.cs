@@ -2,7 +2,7 @@
 
 namespace RudyAtkinson.Tile.Model
 {
-    public class TileClick
+    public class TileClickMessage
     {
         public TileView Tile;
     }
