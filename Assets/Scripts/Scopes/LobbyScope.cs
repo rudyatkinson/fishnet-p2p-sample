@@ -1,4 +1,7 @@
 using MessagePipe;
+using RudyAtkinson.EOSLobby.Controller;
+using RudyAtkinson.EOSLobby.Repository;
+using RudyAtkinson.EOSLobby.Service;
 using RudyAtkinson.Lobby.Controller;
 using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.Lobby.Repository;
@@ -22,10 +25,12 @@ namespace RudyAtkinson.Scopes
             builder.RegisterComponent(_lobbyView);
             builder.RegisterComponent(_lobbyServerController);
             builder.RegisterComponent(_lobbyPlayerView);
-            
-            builder.Register<LobbyController>(Lifetime.Singleton)
-                .AsImplementedInterfaces();
+
+            builder.Register<EOSLobbyService>(Lifetime.Singleton);
+            builder.Register<LobbyController>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<EOSLobbyController>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LobbyRepository>(Lifetime.Singleton);
+            builder.Register<EOSLobbyRepository>(Lifetime.Singleton);
             builder.Register<LobbyPlayerViewFactory>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();

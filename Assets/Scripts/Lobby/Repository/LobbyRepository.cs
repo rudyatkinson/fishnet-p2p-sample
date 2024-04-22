@@ -11,5 +11,6 @@ namespace RudyAtkinson.Lobby.Repository
         public AllLobbyPlayersReadyCountdownMessage AllLobbyPlayersReadyCountdownMessageData { get; set; } = new(false);
         public Result EOSLoginResult { get; set; } = Result.NoConnection;
         public bool TriedToLoginEOSAtInitialTime { get; set; }
+        public bool IsServerBrowserActive { get; set; }
     }
 }

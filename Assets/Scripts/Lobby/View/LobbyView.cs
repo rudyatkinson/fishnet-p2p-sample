@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using Epic.OnlineServices;
 using FishNet.Managing;
-using FishNet.Plugins.FishyEOS.Util;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
@@ -16,7 +14,7 @@ namespace RudyAtkinson.Lobby.View
     public class LobbyView : MonoBehaviour
     {
         private const int _width = 750;
-        private const int _height = 225;
+        private const int _height = 300;
 
         private NetworkManager _networkManager;
         private FishyEOS _fishyEos;
@@ -28,6 +26,9 @@ namespace RudyAtkinson.Lobby.View
         
         public event Action HostButtonClick;
         public event Action JoinButtonClick;
+        public event Action ServerBrowserButtonClick;
+        public event Action CloseServerBrowserButtonClick;
+        public event Action LoginEOSTryAgainButtonClick;
         
         
         [Inject]
@@ -49,9 +50,6 @@ namespace RudyAtkinson.Lobby.View
             {
                 PlayerPrefs.SetString("rudyatkinson-player-name", "Player");
             }
-
-            StartCoroutine(EOSLoginCoroutine());
-            
         }
 
         private void OnEnable()
@@ -73,27 +71,6 @@ namespace RudyAtkinson.Lobby.View
             
             _messageDisposables?.Dispose();
         }
-        
-        private IEnumerator EOSLoginCoroutine()
-        {
-            yield return new AuthData().Connect(out var authDataLogin);
-            
-            var nullableLoginCallback = authDataLogin.loginCallbackInfo;
-            if (!nullableLoginCallback.HasValue)
-            {
-                _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
-
-                yield break;
-            }
-            
-            var loginCallback = nullableLoginCallback.Value;
-            
-            Debug.Log($"EOS Login Result: {loginCallback.ResultCode}");
-
-            _lobbyRepository.EOSLoginResult = loginCallback.ResultCode;
-
-            _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
-        }
 
         private void OnGUI()
         {
@@ -106,6 +83,12 @@ namespace RudyAtkinson.Lobby.View
             if (_lobbyRepository.EOSLoginResult != Result.Success)
             {
                 DrawLoginErrorUI();
+                return;
+            }
+
+            if (_lobbyRepository.IsServerBrowserActive)
+            {
+                DrawServerBrowserUI();
                 return;
             }
             
@@ -147,7 +130,7 @@ namespace RudyAtkinson.Lobby.View
             if (GUILayout.Button("Try Again", new GUIStyle("button") { fontSize = 42 }, GUILayout.Width(750), GUILayout.Height(75)))
             {
                 _lobbyRepository.TriedToLoginEOSAtInitialTime = false;
-                StartCoroutine(EOSLoginCoroutine());
+                LoginEOSTryAgainButtonClick?.Invoke();
             }
             GUILayout.EndArea();
         }
@@ -182,6 +165,12 @@ namespace RudyAtkinson.Lobby.View
             }
             
             GUILayout.EndHorizontal();
+            
+            if (GUILayout.Button("SERVER BROWSER", new GUIStyle("button"){fontSize = 42},GUILayout.Width(750), GUILayout.Height(75)))
+            {
+                ServerBrowserButtonClick?.Invoke();
+            }
+            
             GUILayout.EndArea();
         }
 
@@ -218,6 +207,11 @@ namespace RudyAtkinson.Lobby.View
             GUILayout.Label($"Starting in {_lobbyRepository.AllLobbyPlayersReadyCountdownMessageData.Countdown}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
 
             GUILayout.EndArea();
+        }
+        
+        private void DrawServerBrowserUI()
+        {
+            
         }
         
         private void OnClientConnectionStateChanged(ClientConnectionStateArgs obj)
