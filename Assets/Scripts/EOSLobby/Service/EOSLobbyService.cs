@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
@@ -46,14 +47,14 @@ namespace RudyAtkinson.EOSLobby.Service
             
             Debug.Log($"[EOSLobby] Result: {_createLobbyCallbackInfo?.ResultCode}, Id: {_createLobbyCallbackInfo?.LobbyId}");
             
-            EOS.GetManager().StartCoroutine(UpdateLobbyAttributes(_createLobbyCallbackInfo?.LobbyId, "LobbyName", "Lobby's Name temp now."));
+            EOS.GetManager().StartCoroutine(UpdateLobbyAttributes());
         }
         
-        public IEnumerator UpdateLobbyAttributes(string lobbyId, Utf8String attributeKey, Utf8String attributeValue)
+        private IEnumerator UpdateLobbyAttributes()
         {
             var updateLobbyModificationOptions = new UpdateLobbyModificationOptions
             {
-                LobbyId = lobbyId,
+                LobbyId = _eosLobbyRepository.LobbyId,
                 LocalUserId = EOS.LocalProductUserId
             };
             
@@ -63,8 +64,8 @@ namespace RudyAtkinson.EOSLobby.Service
             {
                 Attribute = new AttributeData
                 {
-                    Key = attributeKey,
-                    Value = new AttributeDataValue { AsUtf8 = attributeValue },
+                    Key = "LobbyName",
+                    Value = new AttributeDataValue { AsUtf8 = $"{PlayerPrefs.GetString("rudyatkinson-player-name")}'s Lobby" }
                 },
                 Visibility = LobbyAttributeVisibility.Public
             };
@@ -143,7 +144,7 @@ namespace RudyAtkinson.EOSLobby.Service
 
                         lobbySearch.Release();
 
-                        _eosLobbyRepository.LobbyDetails = lobbyDetails;
+                        _eosLobbyRepository.LobbyDetails = lobbyDetails.ToList();
 
                         Debug.Log($"[EOSLobby] Lobby Count: {lobbyDetails.Length}");
 
