@@ -146,19 +146,6 @@ namespace RudyAtkinson.EOSLobby.Service
                         _eosLobbyRepository.LobbyDetails = lobbyDetails;
 
                         Debug.Log($"[EOSLobby] Lobby Count: {lobbyDetails.Length}");
-                        foreach (var lobbyDetail in lobbyDetails)
-                        {
-                            var lobbyCopyAttributeByKeyOptions = new LobbyDetailsCopyAttributeByKeyOptions
-                                { AttrKey = "LobbyName" };
-                            lobbyDetail.CopyAttributeByKey(ref lobbyCopyAttributeByKeyOptions, out var lobbyAttribute);
-
-                            if (!lobbyAttribute.HasValue)
-                            {
-                                continue;
-                            }
-
-                            Debug.Log($"[EOSLobby] LobbyName Attribute: {lobbyAttribute.Value.Data?.Value.AsUtf8}");
-                        }
 
                         _lobbySearchFindCallbackInfo = data;
                     });
