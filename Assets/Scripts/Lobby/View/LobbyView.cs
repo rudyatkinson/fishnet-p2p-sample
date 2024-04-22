@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using Epic.OnlineServices;
+using Epic.OnlineServices.Lobby;
 using FishNet.Managing;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
+using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.Lobby.Repository;
 using UnityEngine;
@@ -15,10 +18,12 @@ namespace RudyAtkinson.Lobby.View
     {
         private const int _width = 750;
         private const int _height = 300;
+        private const int _heightForEachElementAtServerBrowser = 75;
 
         private NetworkManager _networkManager;
         private FishyEOS _fishyEos;
         private LobbyRepository _lobbyRepository;
+        private EOSLobbyRepository _eosLobbyRepository;
 
         private ISubscriber<AllLobbyPlayersReadyCountdownMessage> _allLobbyPlayersReadyCountdownSubscriber;
 
@@ -29,17 +34,20 @@ namespace RudyAtkinson.Lobby.View
         public event Action ServerBrowserButtonClick;
         public event Action CloseServerBrowserButtonClick;
         public event Action LoginEOSTryAgainButtonClick;
+        public event Action JoinToLobbyButtonClick;
         
         
         [Inject]
         public void Construct(LobbyRepository lobbyRepository,
             NetworkManager networkManager,
             FishyEOS fishyEos,
-            ISubscriber<AllLobbyPlayersReadyCountdownMessage> allLobbyPlayersReadyCountdownSubscriber)
+            ISubscriber<AllLobbyPlayersReadyCountdownMessage> allLobbyPlayersReadyCountdownSubscriber,
+            EOSLobbyRepository eosLobbyRepository)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
             _lobbyRepository = lobbyRepository;
+            _eosLobbyRepository = eosLobbyRepository;
 
             _allLobbyPlayersReadyCountdownSubscriber = allLobbyPlayersReadyCountdownSubscriber;
         }
@@ -211,7 +219,59 @@ namespace RudyAtkinson.Lobby.View
         
         private void DrawServerBrowserUI()
         {
+            var lobbyDetails = _eosLobbyRepository.LobbyDetails;
+            var areaHeight = (lobbyDetails.Count + 1) * _heightForEachElementAtServerBrowser;
+            GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - areaHeight * .5f, _width, _height));
+            GUILayout.BeginHorizontal();
             
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginVertical();
+            
+            GUILayout.BeginHorizontal();
+
+            if (lobbyDetails.Any())
+            {
+                GUILayout.Label("Lobby Name", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold}, GUILayout.Width(475), GUILayout.Height(75));
+                GUILayout.Label("Players", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold}, GUILayout.Width(275), GUILayout.Height(75));
+            }
+            else
+            {
+                GUILayout.Label("Cannot find any lobby, searching...", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold}, GUILayout.Width(_width), GUILayout.Height(75));
+            }
+            GUILayout.EndHorizontal();
+
+            foreach (var lobbyDetail in lobbyDetails)
+            {
+                var option = new LobbyDetailsCopyAttributeByKeyOptions() { AttrKey = "LobbyName" };
+                var lobbyNameAttribute = lobbyDetail.CopyAttributeByKey(ref option, out var lobbyNameResult);
+
+                var getMemberCountOption = new LobbyDetailsGetMemberCountOptions();
+                var lobbyMemberCount = lobbyDetail.GetMemberCount(ref getMemberCountOption);
+                
+                if (lobbyNameAttribute != Result.Success)
+                {
+                    Debug.Log($"[EOSLobby] DrawServerBrowserUI failed a lobby detail");
+                    continue;
+                }
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(lobbyNameResult?.Data?.Value.AsUtf8, new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Normal}, GUILayout.Width(475), GUILayout.Height(75));
+                GUILayout.Label($"{lobbyMemberCount}/2", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Normal}, GUILayout.Width(75), GUILayout.Height(75));
+                
+                if (GUILayout.Button("JOIN", new GUIStyle("button"){fontSize = 42}, GUILayout.Width(200), GUILayout.Height(75)))
+                {
+                    JoinToLobbyButtonClick?.Invoke();
+                }
+                GUILayout.EndHorizontal();
+            }
+
+            if (GUILayout.Button("BACK", new GUIStyle("button"){fontSize = 42}, GUILayout.Width(_width), GUILayout.Height(75)))
+            {
+                CloseServerBrowserButtonClick?.Invoke();
+            }
+            GUILayout.EndVertical();
+            
+            GUILayout.EndArea();
         }
         
         private void OnClientConnectionStateChanged(ClientConnectionStateArgs obj)
