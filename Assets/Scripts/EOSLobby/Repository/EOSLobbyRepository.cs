@@ -7,6 +7,6 @@ namespace RudyAtkinson.EOSLobby.Repository
     public class EOSLobbyRepository
     {
         public Utf8String LobbyId { get; set; }
-        public List<LobbyDetails> LobbyDetails { get; set; } = new();
+        public Dictionary<LobbyDetails, LobbyDetailsInfo> LobbyDetails { get; set; } = new();
     }
 }

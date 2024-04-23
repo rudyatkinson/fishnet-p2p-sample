@@ -117,6 +117,8 @@ namespace RudyAtkinson.EOSLobby.Service
 
             yield return new WaitUntilOrTimeout(() => _joinLobbyCallbackInfo.HasValue, 30f,
                 () => _joinLobbyCallbackInfo = new JoinLobbyCallbackInfo { ResultCode = Result.TimedOut });
+            
+            _eosLobbyRepository.LobbyId = _joinLobbyCallbackInfo?.LobbyId;
         }
         
         public IEnumerator LeaveLobby(string lobbyId, ProductUserId localUserId)
@@ -173,7 +175,26 @@ namespace RudyAtkinson.EOSLobby.Service
 
                         lobbySearch.Release();
 
-                        _eosLobbyRepository.LobbyDetails = lobbyDetails.ToList();
+                        var lobbyDetailsDict = new Dictionary<LobbyDetails, LobbyDetailsInfo>();
+                        foreach (var lobbyDetail in lobbyDetails)
+                        {
+                            var lobbyDetailsCopyInfoOptions = new LobbyDetailsCopyInfoOptions();
+                            var lobbyDetailsResult = lobbyDetail.CopyInfo(ref lobbyDetailsCopyInfoOptions, out var lobbyDetailsInfo);
+
+                            var getMemberCountOption = new LobbyDetailsGetMemberCountOptions();
+                            var lobbyMemberCount = lobbyDetail.GetMemberCount(ref getMemberCountOption);
+                
+                            if (lobbyDetailsResult != Result.Success || 
+                                !lobbyDetailsInfo.HasValue || 
+                                lobbyMemberCount != 1)
+                            {
+                                continue;
+                            }
+                
+                            lobbyDetailsDict.Add(lobbyDetail, lobbyDetailsInfo.Value);
+                        }
+                        
+                        _eosLobbyRepository.LobbyDetails = lobbyDetailsDict;
 
                         Debug.Log($"[EOSLobby] Lobby Count: {lobbyDetails.Length}");
 

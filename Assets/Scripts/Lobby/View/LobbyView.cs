@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
@@ -226,6 +227,7 @@ namespace RudyAtkinson.Lobby.View
         private void DrawServerBrowserUI()
         {
             var lobbyDetails = _eosLobbyRepository.LobbyDetails;
+                        
             var areaHeight = (lobbyDetails.Count + 2) * _heightForEachElementAtServerBrowser;
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - areaHeight * .5f, _width, areaHeight));
             GUILayout.BeginHorizontal();
@@ -247,26 +249,27 @@ namespace RudyAtkinson.Lobby.View
             }
             GUILayout.EndHorizontal();
 
-            foreach (var lobbyDetail in lobbyDetails)
+            foreach (var lobbyDetailKvp in lobbyDetails)
             {
                 var option = new LobbyDetailsCopyAttributeByKeyOptions() { AttrKey = "LobbyName" };
-                var lobbyNameAttribute = lobbyDetail.CopyAttributeByKey(ref option, out var lobbyNameResult);
+                var lobbyNameAttribute = lobbyDetailKvp.Key.CopyAttributeByKey(ref option, out var lobbyNameResult);
 
                 var getMemberCountOption = new LobbyDetailsGetMemberCountOptions();
-                var lobbyMemberCount = lobbyDetail.GetMemberCount(ref getMemberCountOption);
+                var lobbyMemberCount = lobbyDetailKvp.Key.GetMemberCount(ref getMemberCountOption);
                 
                 if (lobbyNameAttribute != Result.Success)
                 {
                     Debug.Log($"[EOSLobby] DrawServerBrowserUI failed a lobby detail");
                     continue;
                 }
+                
                 GUILayout.BeginHorizontal(GUILayout.MaxHeight(75f));
                 GUILayout.Label(lobbyNameResult?.Data?.Value.AsUtf8, new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Normal}, GUILayout.Width(475), GUILayout.Height(75));
-                GUILayout.Label($"{lobbyMemberCount}/2", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Normal}, GUILayout.Width(75), GUILayout.Height(75));
+                GUILayout.Label($"{lobbyMemberCount}/{lobbyDetailKvp.Value.MaxMembers}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Normal}, GUILayout.Width(75), GUILayout.Height(75));
                 
                 if (GUILayout.Button("JOIN", new GUIStyle("button"){fontSize = 42}, GUILayout.Width(200), GUILayout.Height(75)))
                 {
-                    JoinToLobbyButtonClick?.Invoke(lobbyDetail);
+                    JoinToLobbyButtonClick?.Invoke(lobbyDetailKvp.Key);
                 }
                 GUILayout.EndHorizontal();
             }
