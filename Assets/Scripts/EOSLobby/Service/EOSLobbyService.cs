@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
@@ -52,10 +53,10 @@ namespace RudyAtkinson.EOSLobby.Service
             
             Debug.Log($"[EOSLobby] Result: {_createLobbyCallbackInfo?.ResultCode}, Id: {_createLobbyCallbackInfo?.LobbyId}");
             
-            EOS.GetManager().StartCoroutine(UpdateLobbyAttributes());
+            EOS.GetManager().StartCoroutine(UpdateLobbyNameAndIDAttributes());
         }
         
-        private IEnumerator UpdateLobbyAttributes()
+        private IEnumerator UpdateLobbyNameAndIDAttributes()
         {
             var updateLobbyModificationOptions = new UpdateLobbyModificationOptions
             {
@@ -100,8 +101,37 @@ namespace RudyAtkinson.EOSLobby.Service
 
             yield return new WaitUntilOrTimeout(() => _updateLobbyCallbackInfo.HasValue, 30f,
                 () => _updateLobbyCallbackInfo = new UpdateLobbyCallbackInfo { ResultCode = Result.TimedOut });
+        }
+
+        public IEnumerator UpdateLobbyPermissionLevelAttribute(LobbyPermissionLevel permissionLevel)
+        {
+            var updateLobbyModificationOptions = new UpdateLobbyModificationOptions
+            {
+                LobbyId = _eosLobbyRepository.LobbyId,
+                LocalUserId = EOS.LocalProductUserId
+            };
             
-            Debug.Log($"[EOSLobby] Result: {_updateLobbyCallbackInfo?.ResultCode}, Id: {_updateLobbyCallbackInfo?.LobbyId}");
+            _lobbyInterface.UpdateLobbyModification(ref updateLobbyModificationOptions, out var lobbyModification);
+
+            var setPermissionLevelAttributeOption = new LobbyModificationSetPermissionLevelOptions()
+            {
+                PermissionLevel = permissionLevel
+            };
+            lobbyModification.SetPermissionLevel(ref setPermissionLevelAttributeOption);
+            
+            var updateLobbyOptions = new UpdateLobbyOptions
+            {
+                LobbyModificationHandle = lobbyModification,
+            };
+            
+            _lobbyInterface.UpdateLobby(ref updateLobbyOptions, null,
+                (ref UpdateLobbyCallbackInfo callbackInfo) =>
+                {
+                    _updateLobbyCallbackInfo = callbackInfo;
+                });
+
+            yield return new WaitUntilOrTimeout(() => _updateLobbyCallbackInfo.HasValue, 30f,
+                () => _updateLobbyCallbackInfo = new UpdateLobbyCallbackInfo { ResultCode = Result.TimedOut });
         }
         
         public IEnumerator JoinLobby(ProductUserId localUserId, LobbyDetails lobbyDetails)
