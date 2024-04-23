@@ -4,9 +4,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Plugins.FishyEOS.Util;
 using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
+using RudyAtkinson.EOSLobby.Repository;
+using RudyAtkinson.EOSLobby.Service;
 using RudyAtkinson.Gameplay.Message;
 using RudyAtkinson.Gameplay.Repository;
 using RudyAtkinson.Tile.Message;
@@ -23,6 +26,8 @@ namespace RudyAtkinson.Gameplay.Controller
         private TileRepository _tileRepository;
         private GameplayRepository _gameplayRepository;
         private FishyEOS _fishyEos;
+        private EOSLobbyService _eosLobbyService;
+        private EOSLobbyRepository _eosLobbyRepository;
         
         private IPublisher<NewGameCountdownMessage> _newGameCountdownPublisher;
         private IPublisher<NewGameStartMessage> _newGameStartPublisher;
@@ -45,7 +50,9 @@ namespace RudyAtkinson.Gameplay.Controller
             IPublisher<UpdateWinScoresMessage> updateWinScoresPublisher,
             IPublisher<ShowWinConditionMessage> showWinConditionPublisher,
             IPublisher<UpdateTurnInfoMessage> updateTurnInfoPublisher,
-            IPublisher<NotYourTurnMessage> notYourTurnPublisher)
+            IPublisher<NotYourTurnMessage> notYourTurnPublisher,
+            EOSLobbyService eosLobbyService,
+            EOSLobbyRepository eosLobbyRepository)
         {
             _tileClickSubscriber = tileClickSubscriber;
             _tileRepository = tileRepository;
@@ -57,6 +64,8 @@ namespace RudyAtkinson.Gameplay.Controller
             _showWinConditionPublisher = showWinConditionPublisher;
             _updateTurnInfoPublisher = updateTurnInfoPublisher;
             _notYourTurnPublisher = notYourTurnPublisher;
+            _eosLobbyService = eosLobbyService;
+            _eosLobbyRepository = eosLobbyRepository;
         }
 
         private void OnEnable()
@@ -129,17 +138,6 @@ namespace RudyAtkinson.Gameplay.Controller
                 
                 obsoleteTile.TileModel.Value = obsoleteTileModel;
             }
-
-            if (markQueue.Count >= 3)
-            {
-                var color = Color.white;
-                color.a = .25f;
-                markQueue.First().Color.Value = color;
-            }
-
-            var nextTurnMark = isHost ? opponentMark : hostMark;
-            
-            _gameplayRepository.SetMarkTurn(nextTurnMark);
             
             var hasWon = CheckForWin(_tileRepository.MarkMatrix(), mark);
             if (hasWon)
@@ -157,11 +155,23 @@ namespace RudyAtkinson.Gameplay.Controller
 
                     LockPlayerInput(false);
                 });
+
+                return;
             }
-            else
+
+            var nextTurnMark = isHost ? opponentMark : hostMark;
+            
+            var nextMarkQueue = tileDict[nextTurnMark];
+            if (nextMarkQueue.Count >= 3)
             {
-                Observers_TurnChanged(!isHost);
+                var color = Color.white;
+                color.a = .25f;
+                nextMarkQueue.First().Color.Value = color;
             }
+            
+            _gameplayRepository.SetMarkTurn(nextTurnMark);
+            
+            Observers_TurnChanged(!isHost);
         }
         
         private bool CheckForWin(char[,] grid, char playerMark)
@@ -212,7 +222,10 @@ namespace RudyAtkinson.Gameplay.Controller
         private void ClearTiles()
         {
             Debug.Log($"[Server] Tiles Cleared!");
-            _tileRepository.TileMarkQueueDictionary.Clear();
+            foreach (var kvp in _tileRepository.TileMarkQueueDictionary)
+            {
+                kvp.Value.Clear();
+            }
             
             foreach (var tileView in _tileRepository.TileViews)
             {
@@ -220,6 +233,7 @@ namespace RudyAtkinson.Gameplay.Controller
                 tileModel.Mark = ' ';
 
                 tileView.TileModel.Value = tileModel;
+                tileView.Color.Value = Color.white;
             }
         }
 
@@ -236,6 +250,7 @@ namespace RudyAtkinson.Gameplay.Controller
             if (obj.ConnectionState == LocalConnectionState.Stopping)
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+                _eosLobbyService.LeaveLobby(_eosLobbyRepository.LobbyId, EOS.LocalProductUserId).ToUniTask();
             }
         }
         #endregion

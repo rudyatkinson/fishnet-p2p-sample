@@ -7,7 +7,7 @@ namespace RudyAtkinson.Tile.Repository
     public class TileRepository
     {
         public List<TileView> TileViews { get; } = new ();
-        public Dictionary<char, Queue<TileView>> TileMarkQueueDictionary { get; } = new ();
+        public Dictionary<char, Queue<TileView>> TileMarkQueueDictionary { get; } = new () { {'X', new Queue<TileView>()}, {'O', new Queue<TileView>()}};
 
         public char[,] MarkMatrix()
         {
