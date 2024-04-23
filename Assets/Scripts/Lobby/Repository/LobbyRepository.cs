@@ -12,5 +12,6 @@ namespace RudyAtkinson.Lobby.Repository
         public Result EOSLoginResult { get; set; } = Result.NoConnection;
         public bool TriedToLoginEOSAtInitialTime { get; set; }
         public bool IsServerBrowserActive { get; set; }
+        public bool TriedToJoinLobbyViaServerBrowser { get; set; }
     }
 }

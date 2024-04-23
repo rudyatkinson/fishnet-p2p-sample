@@ -3,6 +3,7 @@ using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
+using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.EOSLobby.Yield;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace RudyAtkinson.EOSLobby.Service
 {
     public class EOSLobbyService
     {
+        private readonly FishyEOS _fishyEos;
         private readonly LobbyInterface _lobbyInterface = EOS.GetPlatformInterface().GetLobbyInterface();
         private readonly EOSLobbyRepository _eosLobbyRepository;
         
@@ -18,10 +20,13 @@ namespace RudyAtkinson.EOSLobby.Service
         private UpdateLobbyCallbackInfo? _updateLobbyCallbackInfo;
         private LobbySearchFindCallbackInfo? _lobbySearchFindCallbackInfo;
         private LeaveLobbyCallbackInfo? _leaveLobbyCallbackInfo;
+        private JoinLobbyCallbackInfo? _joinLobbyCallbackInfo;
 
-        public EOSLobbyService(EOSLobbyRepository eosLobbyRepository)
+        public EOSLobbyService(EOSLobbyRepository eosLobbyRepository,
+            FishyEOS fishyEos)
         {
             _eosLobbyRepository = eosLobbyRepository;
+            _fishyEos = fishyEos;
         }
 
         public IEnumerator CreateLobby(ProductUserId localUserId)
@@ -60,7 +65,7 @@ namespace RudyAtkinson.EOSLobby.Service
             
             _lobbyInterface.UpdateLobbyModification(ref updateLobbyModificationOptions, out var lobbyModification);
             
-            var addAttributeOptions = new LobbyModificationAddAttributeOptions
+            var addLobbyNameAttributeOptions = new LobbyModificationAddAttributeOptions
             {
                 Attribute = new AttributeData
                 {
@@ -69,8 +74,18 @@ namespace RudyAtkinson.EOSLobby.Service
                 },
                 Visibility = LobbyAttributeVisibility.Public
             };
-            
-            lobbyModification.AddAttribute(ref addAttributeOptions);
+            lobbyModification.AddAttribute(ref addLobbyNameAttributeOptions);
+
+            var addConnectionIdAttributeOption = new LobbyModificationAddAttributeOptions()
+            {
+                Attribute = new AttributeData()
+                {
+                    Key = "RemoteProductUserId",
+                    Value = new AttributeDataValue() { AsUtf8 = _fishyEos.LocalProductUserId }
+                },
+                Visibility = LobbyAttributeVisibility.Public
+            };
+            lobbyModification.AddAttribute(ref addConnectionIdAttributeOption);
             
             var updateLobbyOptions = new UpdateLobbyOptions
             {
@@ -87,7 +102,21 @@ namespace RudyAtkinson.EOSLobby.Service
                 () => _updateLobbyCallbackInfo = new UpdateLobbyCallbackInfo { ResultCode = Result.TimedOut });
             
             Debug.Log($"[EOSLobby] Result: {_updateLobbyCallbackInfo?.ResultCode}, Id: {_updateLobbyCallbackInfo?.LobbyId}");
+        }
+        
+        public IEnumerator JoinLobby(ProductUserId localUserId, LobbyDetails lobbyDetails)
+        {
+            var joinLobbyOptions = new JoinLobbyOptions
+            {
+                LobbyDetailsHandle = lobbyDetails,
+                LocalUserId = localUserId,
+            };
+            var lobbyInterface = EOS.GetPlatformInterface().GetLobbyInterface();
+            lobbyInterface.JoinLobby(ref joinLobbyOptions, null,
+                (ref JoinLobbyCallbackInfo callbackInfo) => { _joinLobbyCallbackInfo = callbackInfo; });
 
+            yield return new WaitUntilOrTimeout(() => _joinLobbyCallbackInfo.HasValue, 30f,
+                () => _joinLobbyCallbackInfo = new JoinLobbyCallbackInfo { ResultCode = Result.TimedOut });
         }
         
         public IEnumerator LeaveLobby(string lobbyId, ProductUserId localUserId)
