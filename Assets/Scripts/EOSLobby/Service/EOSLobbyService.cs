@@ -4,7 +4,7 @@ using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
 using RudyAtkinson.EOSLobby.Repository;
-using RudyAtkinson.EOSLobby.Support;
+using RudyAtkinson.EOSLobby.Yield;
 using UnityEngine;
 
 namespace RudyAtkinson.EOSLobby.Service
