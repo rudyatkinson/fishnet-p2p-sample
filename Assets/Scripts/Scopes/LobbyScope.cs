@@ -26,11 +26,9 @@ namespace RudyAtkinson.Scopes
             builder.RegisterComponent(_lobbyServerController);
             builder.RegisterComponent(_lobbyPlayerView);
 
-            builder.Register<EOSLobbyService>(Lifetime.Singleton);
             builder.Register<LobbyController>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EOSLobbyController>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LobbyRepository>(Lifetime.Singleton);
-            builder.Register<EOSLobbyRepository>(Lifetime.Singleton);
             builder.Register<LobbyPlayerViewFactory>(Lifetime.Singleton);
 
             builder.RegisterMessagePipe();

@@ -1,5 +1,7 @@
 using FishNet.Managing;
 using FishNet.Transporting.FishyEOSPlugin;
+using RudyAtkinson.EOSLobby.Repository;
+using RudyAtkinson.EOSLobby.Service;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -15,6 +17,9 @@ namespace RudyAtkinson.Scopes
         {
             builder.RegisterComponent(_networkManager);
             builder.RegisterComponent(_fishyEos);
+            
+            builder.Register<EOSLobbyService>(Lifetime.Singleton);
+            builder.Register<EOSLobbyRepository>(Lifetime.Singleton);
         }
     }
 }
