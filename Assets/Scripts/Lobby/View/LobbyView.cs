@@ -205,7 +205,7 @@ namespace RudyAtkinson.Lobby.View
         
         private void DrawConnectionStartedUI()
         {
-            var address = _networkManager.IsHostStarted ? _fishyEos.LocalProductUserId : _fishyEos.RemoteProductUserId;
+            var address = _lobbyRepository.Address;
             
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .1f - _height * .5f, _width, _height));
             if (GUILayout.Button(address, new GUIStyle("label") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))

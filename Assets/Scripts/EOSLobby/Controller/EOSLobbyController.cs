@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Text;
+using System.Text.RegularExpressions;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Managing;
@@ -43,6 +45,7 @@ namespace RudyAtkinson.EOSLobby.Controller
             _fishyEos.OnServerConnectionState += OnServerConnectionState;
             _lobbyView.LoginEOSTryAgainButtonClick += OnLoginEOSTryAgainButtonClick;
             _lobbyView.JoinToLobbyButtonClick += OnJoinToLobbyButtonClick;
+            _lobbyView.JoinButtonClick += OnJoinButtonClick;
         }
 
         public void Dispose()
@@ -51,6 +54,7 @@ namespace RudyAtkinson.EOSLobby.Controller
             _fishyEos.OnServerConnectionState -= OnServerConnectionState;
             _lobbyView.LoginEOSTryAgainButtonClick -= OnLoginEOSTryAgainButtonClick;
             _lobbyView.JoinToLobbyButtonClick -= OnJoinToLobbyButtonClick;
+            _lobbyView.JoinButtonClick -= OnJoinButtonClick;
         }
         
         public void Start()
@@ -64,8 +68,6 @@ namespace RudyAtkinson.EOSLobby.Controller
             {
                 _lobbyRepository.TriedToJoinLobbyViaServerBrowser = false;
                 _lobbyRepository.IsServerBrowserActive = false;
-                
-                //TODO: Join to EOS Lobby if player did not join via Connection ID.
             }
             else if (obj.ConnectionState == LocalConnectionState.Stopped && Application.isPlaying)
             {
@@ -77,8 +79,61 @@ namespace RudyAtkinson.EOSLobby.Controller
         {
             if (obj.ConnectionState == LocalConnectionState.Started)
             {
-                _fishyEos.StartCoroutine(_eosLobbyService.CreateLobby(EOS.LocalProductUserId));
+                var guid = Guid.NewGuid();
+                var encodedLocalProductUserId = Encoding.ASCII.GetBytes(guid.ToString());
+                var convertedLocalProductUserId = Convert.ToBase64String(encodedLocalProductUserId);
+                
+                var regex = new Regex("[^a-zA-Z0-9 -]");
+                var replacedLocalProductUserId = regex.Replace(convertedLocalProductUserId, "");
+
+                var shortLobbyCode = replacedLocalProductUserId[..5];
+                
+                _fishyEos.StartCoroutine(_eosLobbyService.CreateLobby(shortLobbyCode, EOS.LocalProductUserId));
             }
+        }
+
+        private void OnJoinButtonClick()
+        {
+            _fishyEos.StartCoroutine(JoinLobbyById());
+        }
+        
+        private IEnumerator JoinLobbyById()
+        {
+            if (string.IsNullOrEmpty(_lobbyRepository.Address))
+            {
+                yield break;
+            }
+
+            yield return _fishyEos.StartCoroutine(_eosLobbyService.JoinLobbyById(EOS.LocalProductUserId, _lobbyRepository.Address));
+
+            var copyLobbyDetailsHandleOptions = new CopyLobbyDetailsHandleOptions() { LobbyId = _lobbyRepository.Address, LocalUserId = EOS.LocalProductUserId }; 
+            var copyLobbyDetailsHandleResult = EOS.GetPlatformInterface().GetLobbyInterface().CopyLobbyDetailsHandle(ref copyLobbyDetailsHandleOptions, out var lobbyDetails);
+
+            yield return copyLobbyDetailsHandleResult;
+            
+            if (copyLobbyDetailsHandleResult != Result.Success)
+            {
+                lobbyDetails.Release();
+                yield break;
+            }
+            
+            var lobbyCopyAttributeByKeyOptions = new LobbyDetailsCopyAttributeByKeyOptions { AttrKey = "RemoteProductUserId" };
+            var hostIdAttributeResult = lobbyDetails.CopyAttributeByKey(ref lobbyCopyAttributeByKeyOptions, out var hostIdAttribute);
+
+            yield return hostIdAttributeResult;
+            
+            if (hostIdAttributeResult != Result.Success)
+            {
+                lobbyDetails.Release();
+                yield break;
+            }
+            
+            var lobbyId = hostIdAttribute?.Data?.Value.AsUtf8;
+            
+            _fishyEos.RemoteProductUserId = lobbyId;
+            _networkManager.ClientManager.StartConnection();
+            
+            lobbyDetails.Release();
         }
 
         private void OnLoginEOSTryAgainButtonClick()

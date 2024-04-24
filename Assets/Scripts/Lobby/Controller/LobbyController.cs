@@ -35,7 +35,6 @@ namespace RudyAtkinson.Lobby.Controller
         public void Start()
         {
             _lobbyView.HostButtonClick += OnHostButtonClick;
-            _lobbyView.JoinButtonClick += OnJoinButtonClick;
             _lobbyView.ServerBrowserButtonClick += OnServerBrowserButtonClick;
             _lobbyView.CloseServerBrowserButtonClick += OnCloseServerBrowserButtonClick;
         }
@@ -43,7 +42,6 @@ namespace RudyAtkinson.Lobby.Controller
         public void Dispose()
         {
             _lobbyView.HostButtonClick -= OnHostButtonClick;
-            _lobbyView.JoinButtonClick -= OnJoinButtonClick;
             _lobbyView.ServerBrowserButtonClick -= OnServerBrowserButtonClick;
             _lobbyView.CloseServerBrowserButtonClick -= OnCloseServerBrowserButtonClick;
         }
@@ -51,18 +49,6 @@ namespace RudyAtkinson.Lobby.Controller
         private void OnHostButtonClick()
         {
             _networkManager.ServerManager.StartConnection();
-            _networkManager.ClientManager.StartConnection();
-        }
-
-        private void OnJoinButtonClick()
-        {
-            if (string.IsNullOrEmpty(_lobbyRepository.Address))
-            {
-                return;
-            }
-
-            _fishyEos.RemoteProductUserId = _lobbyRepository.Address;
-
             _networkManager.ClientManager.StartConnection();
         }
         
