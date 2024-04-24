@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
 using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.EOSLobby.Yield;
+using RudyAtkinson.Lobby.Repository;
 using UnityEngine;
 
 namespace RudyAtkinson.EOSLobby.Service
@@ -16,28 +16,34 @@ namespace RudyAtkinson.EOSLobby.Service
         private readonly FishyEOS _fishyEos;
         private readonly LobbyInterface _lobbyInterface = EOS.GetPlatformInterface().GetLobbyInterface();
         private readonly EOSLobbyRepository _eosLobbyRepository;
+        private readonly LobbyRepository _lobbyRepository;
         
         private CreateLobbyCallbackInfo? _createLobbyCallbackInfo;
         private UpdateLobbyCallbackInfo? _updateLobbyCallbackInfo;
         private LobbySearchFindCallbackInfo? _lobbySearchFindCallbackInfo;
         private LeaveLobbyCallbackInfo? _leaveLobbyCallbackInfo;
         private JoinLobbyCallbackInfo? _joinLobbyCallbackInfo;
+        private JoinLobbyByIdCallbackInfo? _joinLobbyByIdCallbackInfo;
 
         public EOSLobbyService(EOSLobbyRepository eosLobbyRepository,
-            FishyEOS fishyEos)
+            FishyEOS fishyEos,
+            LobbyRepository lobbyRepository)
         {
             _eosLobbyRepository = eosLobbyRepository;
             _fishyEos = fishyEos;
+            _lobbyRepository = lobbyRepository;
         }
 
-        public IEnumerator CreateLobby(ProductUserId localUserId)
+        public IEnumerator CreateLobby(string lobbyId, ProductUserId localUserId)
         {
             var createLobbyOptions = new CreateLobbyOptions
             {
                 LocalUserId = localUserId,
                 MaxLobbyMembers = 2,
                 PermissionLevel = LobbyPermissionLevel.Publicadvertised,
-                BucketId = "fishnet-p2p-sample"
+                BucketId = "fishnet-p2p-sample",
+                EnableJoinById = true,
+                LobbyId = lobbyId
             };
             
             _lobbyInterface.CreateLobby(ref createLobbyOptions, null,
@@ -49,6 +55,7 @@ namespace RudyAtkinson.EOSLobby.Service
             yield return new WaitUntilOrTimeout(() => _createLobbyCallbackInfo.HasValue, 30f,
                 () => _createLobbyCallbackInfo = new CreateLobbyCallbackInfo { ResultCode = Result.TimedOut });
 
+            _lobbyRepository.Address = lobbyId;
             _eosLobbyRepository.LobbyId = _createLobbyCallbackInfo?.LobbyId;
             
             Debug.Log($"[EOSLobby] Result: {_createLobbyCallbackInfo?.ResultCode}, Id: {_createLobbyCallbackInfo?.LobbyId}");
@@ -140,6 +147,7 @@ namespace RudyAtkinson.EOSLobby.Service
             {
                 LobbyDetailsHandle = lobbyDetails,
                 LocalUserId = localUserId,
+                
             };
             var lobbyInterface = EOS.GetPlatformInterface().GetLobbyInterface();
             lobbyInterface.JoinLobby(ref joinLobbyOptions, null,
@@ -149,6 +157,24 @@ namespace RudyAtkinson.EOSLobby.Service
                 () => _joinLobbyCallbackInfo = new JoinLobbyCallbackInfo { ResultCode = Result.TimedOut });
             
             _eosLobbyRepository.LobbyId = _joinLobbyCallbackInfo?.LobbyId;
+        }
+
+        public IEnumerator JoinLobbyById(ProductUserId localUserId, string lobbyId)
+        {
+            var joinLobbyById = new JoinLobbyByIdOptions()
+            {
+                LocalUserId = localUserId,
+                LobbyId = lobbyId
+            };
+
+            var lobbyInterface = EOS.GetPlatformInterface().GetLobbyInterface();
+            lobbyInterface.JoinLobbyById(ref joinLobbyById, null, (ref JoinLobbyByIdCallbackInfo data) =>
+            {
+                _joinLobbyByIdCallbackInfo = data;
+            });
+
+            yield return new WaitUntilOrTimeout(() => _joinLobbyByIdCallbackInfo.HasValue, 30f,
+                () => _joinLobbyByIdCallbackInfo = new JoinLobbyByIdCallbackInfo() { ResultCode = Result.TimedOut });
         }
         
         public IEnumerator LeaveLobby(string lobbyId, ProductUserId localUserId)
