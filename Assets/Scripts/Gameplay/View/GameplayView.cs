@@ -80,6 +80,11 @@ namespace RudyAtkinson.Gameplay.View
             _disconnectButton.onClick.RemoveListener(OnDisconnectButtonClick);
 
             _subscriberDisposables?.Dispose();
+            _newGameCountdownCTS?.Cancel();
+            _newGameStartCTS?.Cancel();
+            _updateTurnInfoCTS?.Cancel();
+            _showWinConditionCTS?.Cancel();
+            _notYourTurnCTS?.Cancel();
         }
         
 
@@ -232,20 +237,6 @@ namespace RudyAtkinson.Gameplay.View
             text.transform.localScale = Vector3.one;
 
             return text;
-        }
-
-        private void InitTextTask(CancellationTokenSource cts, TMP_Text text, int delaySeconds = 5)
-        {
-            UniTask.Delay(TimeSpan.FromSeconds(delaySeconds))
-                .WithCancellation(cts.Token)
-                .AsAsyncUnitUniTask()
-                .ContinueWith(_ =>
-                {
-                    cts?.Dispose();
-                    cts = null;
-                    
-                    Destroy(text.gameObject);
-                });
         }
     }
 }
