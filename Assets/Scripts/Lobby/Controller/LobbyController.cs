@@ -1,6 +1,7 @@
 ﻿using System;
 using FishNet.Managing;
 using FishNet.Transporting.FishyEOSPlugin;
+using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.EOSLobby.Service;
 using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
@@ -16,6 +17,7 @@ namespace RudyAtkinson.Lobby.Controller
         private readonly NetworkManager _networkManager;
         private readonly FishyEOS _fishyEos;
         private readonly EOSLobbyService _eosLobbyService;
+        private readonly EOSLobbyRepository _eosLobbyRepository;
         
         private Coroutine _searchLobbiesCoroutine;
 
@@ -23,13 +25,15 @@ namespace RudyAtkinson.Lobby.Controller
             LobbyRepository lobbyRepository,
             NetworkManager networkManager,
             FishyEOS fishyEos,
-            EOSLobbyService eosLobbyService)
+            EOSLobbyService eosLobbyService,
+            EOSLobbyRepository eosLobbyRepository)
         {
             _lobbyView = lobbyView;
             _lobbyRepository = lobbyRepository;
             _networkManager = networkManager;
             _fishyEos = fishyEos;
             _eosLobbyService = eosLobbyService;
+            _eosLobbyRepository = eosLobbyRepository;
         }
         
         public void Start()
@@ -54,14 +58,14 @@ namespace RudyAtkinson.Lobby.Controller
         
         private void OnServerBrowserButtonClick()
         {
-            _lobbyRepository.IsServerBrowserActive = true;
+            _eosLobbyRepository.IsServerBrowserActive = true;
             
             StartSearchLobbiesCoroutine();
         }
         
         private void OnCloseServerBrowserButtonClick()
         {
-            _lobbyRepository.IsServerBrowserActive = false;
+            _eosLobbyRepository.IsServerBrowserActive = false;
 
             _fishyEos.StopCoroutine(_searchLobbiesCoroutine);
         }

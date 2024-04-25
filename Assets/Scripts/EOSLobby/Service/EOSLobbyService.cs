@@ -54,8 +54,7 @@ namespace RudyAtkinson.EOSLobby.Service
 
             yield return new WaitUntilOrTimeout(() => _createLobbyCallbackInfo.HasValue, 30f,
                 () => _createLobbyCallbackInfo = new CreateLobbyCallbackInfo { ResultCode = Result.TimedOut });
-
-            _lobbyRepository.Address = lobbyId;
+            
             _eosLobbyRepository.LobbyId = _createLobbyCallbackInfo?.LobbyId;
             
             Debug.Log($"[EOSLobby] Result: {_createLobbyCallbackInfo?.ResultCode}, Id: {_createLobbyCallbackInfo?.LobbyId}");

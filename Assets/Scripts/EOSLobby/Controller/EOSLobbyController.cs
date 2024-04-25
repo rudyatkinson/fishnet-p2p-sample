@@ -21,7 +21,6 @@ namespace RudyAtkinson.EOSLobby.Controller
     {
         private readonly NetworkManager _networkManager;
         private readonly FishyEOS _fishyEos; 
-        private readonly LobbyRepository _lobbyRepository;
         private readonly EOSLobbyService _eosLobbyService;
         private readonly EOSLobbyRepository _eosLobbyRepository;
         private readonly LobbyView _lobbyView;
@@ -29,14 +28,12 @@ namespace RudyAtkinson.EOSLobby.Controller
         public EOSLobbyController(
             NetworkManager networkManager,
             FishyEOS fishyEos,
-            LobbyRepository lobbyRepository,
             EOSLobbyService eosLobbyService,
             EOSLobbyRepository eosLobbyRepository,
             LobbyView lobbyView)
         {
             _networkManager = networkManager;
             _fishyEos = fishyEos;
-            _lobbyRepository = lobbyRepository;
             _eosLobbyService = eosLobbyService;
             _eosLobbyRepository = eosLobbyRepository;
             _lobbyView = lobbyView;
@@ -66,8 +63,8 @@ namespace RudyAtkinson.EOSLobby.Controller
         {
             if (obj.ConnectionState == LocalConnectionState.Started)
             {
-                _lobbyRepository.TriedToJoinLobbyViaServerBrowser = false;
-                _lobbyRepository.IsServerBrowserActive = false;
+                _eosLobbyRepository.TriedToJoinLobbyViaServerBrowser = false;
+                _eosLobbyRepository.IsServerBrowserActive = false;
             }
             else if (obj.ConnectionState == LocalConnectionState.Stopped && Application.isPlaying)
             {
@@ -99,14 +96,14 @@ namespace RudyAtkinson.EOSLobby.Controller
         
         private IEnumerator JoinLobbyById()
         {
-            if (string.IsNullOrEmpty(_lobbyRepository.Address))
+            if (string.IsNullOrEmpty(_eosLobbyRepository.LobbyId))
             {
                 yield break;
             }
 
-            yield return _fishyEos.StartCoroutine(_eosLobbyService.JoinLobbyById(EOS.LocalProductUserId, _lobbyRepository.Address));
+            yield return _fishyEos.StartCoroutine(_eosLobbyService.JoinLobbyById(EOS.LocalProductUserId, _eosLobbyRepository.LobbyId));
 
-            var copyLobbyDetailsHandleOptions = new CopyLobbyDetailsHandleOptions() { LobbyId = _lobbyRepository.Address, LocalUserId = EOS.LocalProductUserId }; 
+            var copyLobbyDetailsHandleOptions = new CopyLobbyDetailsHandleOptions() { LobbyId = _eosLobbyRepository.LobbyId, LocalUserId = EOS.LocalProductUserId }; 
             var copyLobbyDetailsHandleResult = EOS.GetPlatformInterface().GetLobbyInterface().CopyLobbyDetailsHandle(ref copyLobbyDetailsHandleOptions, out var lobbyDetails);
 
             yield return copyLobbyDetailsHandleResult;
@@ -148,8 +145,8 @@ namespace RudyAtkinson.EOSLobby.Controller
 
         private IEnumerator StartEOSLobbyJoin(LobbyDetails lobbyDetails)
         {
-            _lobbyRepository.IsServerBrowserActive = false;
-            _lobbyRepository.TriedToJoinLobbyViaServerBrowser = true;
+            _eosLobbyRepository.IsServerBrowserActive = false;
+            _eosLobbyRepository.TriedToJoinLobbyViaServerBrowser = true;
             
             yield return _fishyEos.StartCoroutine(_eosLobbyService.JoinLobby(EOS.LocalProductUserId, lobbyDetails));
 
@@ -158,8 +155,8 @@ namespace RudyAtkinson.EOSLobby.Controller
 
             if (hostIdAttributeResult != Result.Success)
             {
-                _lobbyRepository.IsServerBrowserActive = true;
-                _lobbyRepository.TriedToJoinLobbyViaServerBrowser = false;
+                _eosLobbyRepository.IsServerBrowserActive = true;
+                _eosLobbyRepository.TriedToJoinLobbyViaServerBrowser = false;
 
                 yield break;
             }
@@ -177,7 +174,7 @@ namespace RudyAtkinson.EOSLobby.Controller
             var nullableLoginCallback = authDataLogin.loginCallbackInfo;
             if (!nullableLoginCallback.HasValue)
             {
-                _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
+                _eosLobbyRepository.TriedToLoginEOSAtInitialTime = true;
 
                 yield break;
             }
@@ -186,9 +183,9 @@ namespace RudyAtkinson.EOSLobby.Controller
             
             Debug.Log($"EOS Login Result: {loginCallback.ResultCode}");
 
-            _lobbyRepository.EOSLoginResult = loginCallback.ResultCode;
+            _eosLobbyRepository.EOSLoginResult = loginCallback.ResultCode;
 
-            _lobbyRepository.TriedToLoginEOSAtInitialTime = true;
+            _eosLobbyRepository.TriedToLoginEOSAtInitialTime = true;
         }
     }
 }

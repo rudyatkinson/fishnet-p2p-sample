@@ -83,25 +83,25 @@ namespace RudyAtkinson.Lobby.View
 
         private void OnGUI()
         {
-            if (!_lobbyRepository.TriedToLoginEOSAtInitialTime)
+            if (!_eosLobbyRepository.TriedToLoginEOSAtInitialTime)
             {
                 DrawLoggingInEOSUI();
                 return;
             }
             
-            if (_lobbyRepository.EOSLoginResult != Result.Success)
+            if (_eosLobbyRepository.EOSLoginResult != Result.Success)
             {
                 DrawLoginErrorUI();
                 return;
             }
 
-            if (_lobbyRepository.IsServerBrowserActive)
+            if (_eosLobbyRepository.IsServerBrowserActive)
             {
                 DrawServerBrowserUI();
                 return;
             }
 
-            if (_lobbyRepository.TriedToJoinLobbyViaServerBrowser)
+            if (_eosLobbyRepository.TriedToJoinLobbyViaServerBrowser)
             {
                 DrawConnectionStartingUI();
                 return;
@@ -140,11 +140,11 @@ namespace RudyAtkinson.Lobby.View
         private void DrawLoginErrorUI()
         {
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .5f - _height * .5f, _width, _height));
-            GUILayout.Label($"Encountered an error during login, {_lobbyRepository.EOSLoginResult}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
+            GUILayout.Label($"Encountered an error during login, {_eosLobbyRepository.EOSLoginResult}", new GUIStyle("label"){fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold}, GUILayout.Width(750), GUILayout.Height(75));
             GUILayout.Space(50);
             if (GUILayout.Button("Try Again", new GUIStyle("button") { fontSize = 42 }, GUILayout.Width(750), GUILayout.Height(75)))
             {
-                _lobbyRepository.TriedToLoginEOSAtInitialTime = false;
+                _eosLobbyRepository.TriedToLoginEOSAtInitialTime = false;
                 LoginEOSTryAgainButtonClick?.Invoke();
             }
             GUILayout.EndArea();
@@ -172,7 +172,7 @@ namespace RudyAtkinson.Lobby.View
 
             GUILayout.BeginHorizontal();
             
-            _lobbyRepository.Address = GUILayout.TextField(_lobbyRepository.Address, new GUIStyle("textfield"){fontSize = 42, alignment = TextAnchor.MiddleLeft}, GUILayout.Width(550), GUILayout.Height(75));
+            _eosLobbyRepository.LobbyId = GUILayout.TextField(_eosLobbyRepository.LobbyId, new GUIStyle("textfield"){fontSize = 42, alignment = TextAnchor.MiddleLeft}, GUILayout.Width(550), GUILayout.Height(75));
 
             if (GUILayout.Button("JOIN", new GUIStyle("button"){fontSize = 42}, GUILayout.Width(200), GUILayout.Height(75)))
             {
@@ -205,7 +205,7 @@ namespace RudyAtkinson.Lobby.View
         
         private void DrawConnectionStartedUI()
         {
-            var address = _lobbyRepository.Address;
+            var address = _eosLobbyRepository.LobbyId;
             
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .1f - _height * .5f, _width, _height));
             if (GUILayout.Button(address, new GUIStyle("label") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))
