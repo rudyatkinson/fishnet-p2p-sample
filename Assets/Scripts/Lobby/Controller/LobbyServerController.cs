@@ -60,7 +60,6 @@ namespace RudyAtkinson.Lobby.Controller
 
         public void OnEnable()
         {
-            _networkManager.ServerManager.OnServerConnectionState += OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += OnClientStateChanged;
 
@@ -71,7 +70,6 @@ namespace RudyAtkinson.Lobby.Controller
         
         public void OnDisable()
         {
-            _networkManager.ServerManager.OnServerConnectionState -= OnServerStateChanged;
             _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState -= OnClientStateChanged;
             
@@ -88,14 +86,6 @@ namespace RudyAtkinson.Lobby.Controller
         #endregion
         
         #region Server Callbacks
-        
-        private void OnServerStateChanged(ServerConnectionStateArgs args)
-        {
-            if (args.ConnectionState == LocalConnectionState.Started)
-            {
-                Debug.Log($"[Server] LocalUserId: {_fishyEos.LocalProductUserId}, This ID is required for other players to join the server.");
-            }
-        }
     
         private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs args)
         {
