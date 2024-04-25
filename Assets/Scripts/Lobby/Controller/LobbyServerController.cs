@@ -117,7 +117,7 @@ namespace RudyAtkinson.Lobby.Controller
             if (clientConnections.Count <= 1)
             {
                 StopCoroutine(_playGameCountdownCoroutine);
-                PublishAllLobbyPlayersReadyCountdown(false, 0);
+                Observers_PublishAllLobbyPlayersReadyCountdown(false, 0);
                 Debug.Log($"[Server] Not enough player to start game.");
                 return;
             }
@@ -143,7 +143,7 @@ namespace RudyAtkinson.Lobby.Controller
             {
                 Debug.Log($"[Server] All players not ready yet to start game.");
                 StopCoroutine(_playGameCountdownCoroutine);
-                PublishAllLobbyPlayersReadyCountdown(false, 0);
+                Observers_PublishAllLobbyPlayersReadyCountdown(false, 0);
             }
         }
 
@@ -153,11 +153,13 @@ namespace RudyAtkinson.Lobby.Controller
             
             while (countdown > 0)
             {
-                PublishAllLobbyPlayersReadyCountdown(true, countdown);
+                Observers_PublishAllLobbyPlayersReadyCountdown(true, countdown);
                 yield return new WaitForSeconds(1);
                 countdown--;
             }
             
+            Observers_PublishAllLobbyPlayersReadyCountdown(false, 0);
+
             _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "PlayScene"));
             _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: "LobbyScene"));
 
@@ -165,7 +167,7 @@ namespace RudyAtkinson.Lobby.Controller
         }
         
         [ObserversRpc]
-        private void PublishAllLobbyPlayersReadyCountdown(bool isEnabled, int countdown)
+        private void Observers_PublishAllLobbyPlayersReadyCountdown(bool isEnabled, int countdown)
         {
             _allLobbyPlayersReadyCountdownPublisher.Publish(new AllLobbyPlayersReadyCountdownMessage(isEnabled, countdown));
         }
