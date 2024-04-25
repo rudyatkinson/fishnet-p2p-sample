@@ -63,7 +63,7 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += OnClientStateChanged;
 
-            var lobbyPlayerReadyDisposable = _lobbyPlayerReadySubscriber.Subscribe(_ => ServerCheckAllPlayersReady());
+            var lobbyPlayerReadyDisposable = _lobbyPlayerReadySubscriber.Subscribe(_ => CheckAllPlayersReady());
             
             _messageSubscriptionCombinedDisposable = DisposableBag.Create(lobbyPlayerReadyDisposable);
         }
@@ -106,11 +106,10 @@ namespace RudyAtkinson.Lobby.Controller
                 _networkManager.ServerManager.Despawn(lobbyPlayer.gameObject, DespawnType.Destroy);
             }
 
-            ServerCheckAllPlayersReady();
+            CheckAllPlayersReady();
         }
-
-        [Server]
-        private void ServerCheckAllPlayersReady()
+        
+        private void CheckAllPlayersReady()
         {
             var clientConnections = _networkManager.ServerManager.Clients.Values;
 
