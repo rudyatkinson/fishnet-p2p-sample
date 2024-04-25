@@ -119,7 +119,7 @@ namespace RudyAtkinson.Lobby.Controller
                 StopCoroutine(_playGameCountdownCoroutine);
                 PublishAllLobbyPlayersReadyCountdown(false, 0);
                 Debug.Log($"[Server] Not enough player to start game.");
-                // return;
+                return;
             }
             
             var allPlayersReady = clientConnections.All(connection =>
