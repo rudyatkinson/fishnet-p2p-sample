@@ -16,7 +16,7 @@ namespace RudyAtkinson.Tile.View
     public class TileView : NetworkBehaviour, IPointerDownHandler
     {
         public readonly SyncVar<TileModel> TileModel = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
-        public readonly SyncVar<Color> Color = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
+        public readonly SyncVar<Color> MarkColor = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         
         [SerializeField] private Image _tileBackground;
         [SerializeField] private Color _hoverColor;
@@ -50,13 +50,13 @@ namespace RudyAtkinson.Tile.View
         public override void OnStartClient()
         {
             TileModel.OnChange += OnTileModelModelChange;
-            Color.OnChange += OnColorChange;
+            MarkColor.OnChange += OnMarkColorChange;
         }
 
         public override void OnStopClient()
         {
             TileModel.OnChange -= OnTileModelModelChange;
-            Color.OnChange -= OnColorChange;
+            MarkColor.OnChange -= OnMarkColorChange;
         }
 
         private void OnTileModelModelChange(TileModel prev, TileModel next, bool asserver)
@@ -66,7 +66,7 @@ namespace RudyAtkinson.Tile.View
             _debugText.SetText(next.Mark.ToString());
         }
 
-        private void OnColorChange(Color prevColor, Color nextColor, bool asServer)
+        private void OnMarkColorChange(Color prevColor, Color nextColor, bool asServer)
         {
             _debugText.color = nextColor;
         }

@@ -121,7 +121,7 @@ namespace RudyAtkinson.Gameplay.Controller
             tileModel.Mark = mark;
 
             tile.TileModel.Value = tileModel;
-            tile.Color.Value = Color.white;
+            tile.MarkColor.Value = Color.white;
             
             var tileDict = _tileRepository.TileMarkQueueDictionary;
             tileDict.TryAdd(mark, new Queue<TileView>());
@@ -166,7 +166,7 @@ namespace RudyAtkinson.Gameplay.Controller
             {
                 var color = Color.white;
                 color.a = .25f;
-                nextMarkQueue.First().Color.Value = color;
+                nextMarkQueue.First().MarkColor.Value = color;
             }
             
             _gameplayRepository.SetMarkTurn(nextTurnMark);
@@ -233,7 +233,7 @@ namespace RudyAtkinson.Gameplay.Controller
                 tileModel.Mark = ' ';
 
                 tileView.TileModel.Value = tileModel;
-                tileView.Color.Value = Color.white;
+                tileView.MarkColor.Value = Color.white;
             }
         }
 
