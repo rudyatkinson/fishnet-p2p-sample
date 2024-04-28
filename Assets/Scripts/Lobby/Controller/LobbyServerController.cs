@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Epic.OnlineServices.Lobby;
 using FishNet.Connection;
@@ -8,12 +9,12 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Transporting;
-using FishNet.Transporting.FishyEOSPlugin;
 using MessagePipe;
 using RudyAtkinson.EOSLobby.Service;
 using RudyAtkinson.Lobby.Message;
 using RudyAtkinson.LobbyPlayer.Model;
 using RudyAtkinson.LobbyPlayer.View;
+using UniRx;
 using UnityEngine;
 using VContainer;
 
@@ -22,7 +23,6 @@ namespace RudyAtkinson.Lobby.Controller
     public class LobbyServerController: NetworkBehaviour
     {
         private NetworkManager _networkManager;
-        private FishyEOS _fishyEos;
         private LobbyPlayerViewFactory _lobbyPlayerViewFactory;
         private EOSLobbyService _eosLobbyService;
 
@@ -32,30 +32,23 @@ namespace RudyAtkinson.Lobby.Controller
 
         private IDisposable _messageSubscriptionCombinedDisposable;
 
-        private IEnumerator _playGameCountdownCoroutine;
+        private IDisposable _playGameCountdownDisposable;
 
         [SerializeField] private NetworkBehaviour _lobbyPlayerParent;
         
         [Inject]
         private void Construct(NetworkManager networkManager,
-            FishyEOS fishyEos,
             LobbyPlayerViewFactory lobbyPlayerViewFactory,
             ISubscriber<LobbyPlayerReadyMessage> lobbyPlayerReadySubscriber,
             IPublisher<AllLobbyPlayersReadyCountdownMessage> allLobbyPlayersReadyCountdownPublisher,
             EOSLobbyService eosLobbyService)
         {
             _networkManager = networkManager;
-            _fishyEos = fishyEos;
             _lobbyPlayerViewFactory = lobbyPlayerViewFactory;
             _eosLobbyService = eosLobbyService;
 
             _allLobbyPlayersReadyCountdownPublisher = allLobbyPlayersReadyCountdownPublisher;
             _lobbyPlayerReadySubscriber = lobbyPlayerReadySubscriber;
-        }
-
-        private void Awake()
-        {
-            _playGameCountdownCoroutine = PlayGameCountdown();
         }
 
         public void OnEnable()
@@ -115,7 +108,7 @@ namespace RudyAtkinson.Lobby.Controller
 
             if (clientConnections.Count <= 1)
             {
-                StopCoroutine(_playGameCountdownCoroutine);
+                _playGameCountdownDisposable?.Dispose();
                 Observers_PublishAllLobbyPlayersReadyCountdown(false, 0);
                 Debug.Log($"[Server] Not enough player to start game.");
                 return;
@@ -135,13 +128,12 @@ namespace RudyAtkinson.Lobby.Controller
 
             if (allPlayersReady)
             {
-                _playGameCountdownCoroutine = PlayGameCountdown();
-                StartCoroutine(_playGameCountdownCoroutine);
+                _playGameCountdownDisposable = Observable.FromCoroutine(PlayGameCountdown).Subscribe();
             }
             else
             {
                 Debug.Log($"[Server] All players not ready yet to start game.");
-                StopCoroutine(_playGameCountdownCoroutine);
+                _playGameCountdownDisposable?.Dispose();
                 Observers_PublishAllLobbyPlayersReadyCountdown(false, 0);
             }
         }
@@ -162,7 +154,7 @@ namespace RudyAtkinson.Lobby.Controller
             _networkManager.SceneManager.LoadGlobalScenes(new SceneLoadData(sceneName: "PlayScene"));
             _networkManager.SceneManager.UnloadGlobalScenes(new SceneUnloadData(sceneName: "LobbyScene"));
 
-            _eosLobbyService.UpdateLobbyPermissionLevelAttribute(LobbyPermissionLevel.Inviteonly).ToUniTask();
+            Observable.FromCoroutine(() => _eosLobbyService.UpdateLobbyPermissionLevelAttribute(LobbyPermissionLevel.Inviteonly)).Subscribe();
         }
         
         [ObserversRpc]

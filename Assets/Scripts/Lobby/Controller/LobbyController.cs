@@ -1,11 +1,11 @@
 ﻿using System;
 using FishNet.Managing;
+using FishNet.Transporting;
 using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.EOSLobby.Service;
-using RudyAtkinson.Lobby.Repository;
 using RudyAtkinson.Lobby.View;
-using UnityEngine;
+using UniRx;
 using VContainer.Unity;
 
 namespace RudyAtkinson.Lobby.Controller
@@ -13,23 +13,20 @@ namespace RudyAtkinson.Lobby.Controller
     public class LobbyController: IDisposable, IStartable
     {
         private readonly LobbyView _lobbyView;
-        private readonly LobbyRepository _lobbyRepository;
         private readonly NetworkManager _networkManager;
         private readonly FishyEOS _fishyEos;
         private readonly EOSLobbyService _eosLobbyService;
         private readonly EOSLobbyRepository _eosLobbyRepository;
         
-        private Coroutine _searchLobbiesCoroutine;
+        private IDisposable _searchLobbiesDisposable;
 
         public LobbyController(LobbyView lobbyView,
-            LobbyRepository lobbyRepository,
             NetworkManager networkManager,
             FishyEOS fishyEos,
             EOSLobbyService eosLobbyService,
             EOSLobbyRepository eosLobbyRepository)
         {
             _lobbyView = lobbyView;
-            _lobbyRepository = lobbyRepository;
             _networkManager = networkManager;
             _fishyEos = fishyEos;
             _eosLobbyService = eosLobbyService;
@@ -38,6 +35,7 @@ namespace RudyAtkinson.Lobby.Controller
         
         public void Start()
         {
+            _fishyEos.OnClientConnectionState += OnClientConnectionState;
             _lobbyView.HostButtonClick += OnHostButtonClick;
             _lobbyView.ServerBrowserButtonClick += OnServerBrowserButtonClick;
             _lobbyView.CloseServerBrowserButtonClick += OnCloseServerBrowserButtonClick;
@@ -45,6 +43,7 @@ namespace RudyAtkinson.Lobby.Controller
 
         public void Dispose()
         {
+            _fishyEos.OnClientConnectionState -= OnClientConnectionState;
             _lobbyView.HostButtonClick -= OnHostButtonClick;
             _lobbyView.ServerBrowserButtonClick -= OnServerBrowserButtonClick;
             _lobbyView.CloseServerBrowserButtonClick -= OnCloseServerBrowserButtonClick;
@@ -67,12 +66,20 @@ namespace RudyAtkinson.Lobby.Controller
         {
             _eosLobbyRepository.IsServerBrowserActive = false;
 
-            _fishyEos.StopCoroutine(_searchLobbiesCoroutine);
+            _searchLobbiesDisposable?.Dispose();
+        }
+
+        private void OnClientConnectionState(ClientConnectionStateArgs args)
+        {
+            _eosLobbyRepository.IsServerBrowserActive = false;
+
+            _searchLobbiesDisposable?.Dispose();
         }
         
         private void StartSearchLobbiesCoroutine()
         {
-            _searchLobbiesCoroutine = _fishyEos.StartCoroutine(_eosLobbyService.SearchLobbiesCoroutine());
+            _searchLobbiesDisposable = Observable.FromCoroutine(_eosLobbyService.SearchLobbiesCoroutine)
+                .Subscribe();
         }
     }
 }

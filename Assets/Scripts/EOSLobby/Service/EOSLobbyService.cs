@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
@@ -7,6 +8,7 @@ using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.EOSLobby.Repository;
 using RudyAtkinson.EOSLobby.Yield;
 using RudyAtkinson.Lobby.Repository;
+using UniRx;
 using UnityEngine;
 
 namespace RudyAtkinson.EOSLobby.Service
@@ -58,8 +60,8 @@ namespace RudyAtkinson.EOSLobby.Service
             _eosLobbyRepository.LobbyId = _createLobbyCallbackInfo?.LobbyId;
             
             Debug.Log($"[EOSLobby] Result: {_createLobbyCallbackInfo?.ResultCode}, Id: {_createLobbyCallbackInfo?.LobbyId}");
-            
-            EOS.GetManager().StartCoroutine(UpdateLobbyNameAndIDAttributes());
+
+            Observable.FromCoroutine(UpdateLobbyNameAndIDAttributes).Subscribe();
         }
         
         private IEnumerator UpdateLobbyNameAndIDAttributes()
