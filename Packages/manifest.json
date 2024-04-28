@@ -5,6 +5,7 @@
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.1.0",
     "com.etdofresh.fishyeos": "https://github.com/ETdoFresh/FishyEOS.git?path=/FishNet/Plugins/FishyEOS",
     "com.firstgeargames.fishnet": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
+    "com.neuecc.unirx": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
     "com.playeveryware.eos": "git@github.com:PlayEveryWare/eos_plugin_for_unity_upm.git",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.feature.2d": "2.0.0",
