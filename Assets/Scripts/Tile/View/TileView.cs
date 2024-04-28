@@ -19,7 +19,6 @@ namespace RudyAtkinson.Tile.View
         public readonly SyncVar<Color> MarkColor = new (new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         
         [SerializeField] private Image _tileBackground;
-        [SerializeField] private Color _hoverColor;
         [SerializeField] private Color _baseOddColor;
         [SerializeField] private Color _baseEvenColor;
         [SerializeField] private TMP_Text _debugText;
