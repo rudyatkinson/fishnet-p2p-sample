@@ -6,11 +6,11 @@
         public int Y;
         public char Mark;
 
-        public TileModel(int x, int y, char mark)
+        public TileModel(int x, int y)
         {
             X = x;
             Y = y;
-            Mark = mark;
+            Mark = ' ';
         }
 
         public override string ToString()
