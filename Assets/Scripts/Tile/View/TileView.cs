@@ -41,7 +41,7 @@ namespace RudyAtkinson.Tile.View
             var x = index / 3;
             var y = index % 3;
 
-            TileModel.Value = new TileModel(x, y, ' ');
+            TileModel.Value = new TileModel(x, y);
             
             _tileRepository.TileViews.Add(this);
         }
