@@ -39,10 +39,8 @@ namespace RudyAtkinson.Gameplay.Controller
             {
                 _networkManager.ServerManager.StopConnection(true);
             }
-            else
-            {
-                _networkManager.ClientManager.StopConnection();
-            }
+            
+            _networkManager.ClientManager.StopConnection();
         }
     }
 }

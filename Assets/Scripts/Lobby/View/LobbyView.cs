@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
@@ -32,6 +31,7 @@ namespace RudyAtkinson.Lobby.View
         
         public event Action HostButtonClick;
         public event Action JoinButtonClick;
+        public event Action LeaveButtonClick;
         public event Action ServerBrowserButtonClick;
         public event Action CloseServerBrowserButtonClick;
         public event Action LoginEOSTryAgainButtonClick;
@@ -208,9 +208,16 @@ namespace RudyAtkinson.Lobby.View
             var address = _eosLobbyRepository.LobbyId;
             
             GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .1f - _height * .5f, _width, _height));
-            if (GUILayout.Button(address, new GUIStyle("label") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))
+            if (GUILayout.Button("Lobby ID: " + address, new GUIStyle("label") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))
             {
                 GUIUtility.systemCopyBuffer = address;
+            }
+            GUILayout.EndArea();
+            
+            GUILayout.BeginArea(new Rect(Screen.width * .5f - _width * .5f, Screen.height * .9f, _width, _height));
+            if (GUILayout.Button("Leave", new GUIStyle("button") { fontSize = 42, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }, GUILayout.Width(750), GUILayout.Height(75)))
+            {
+                LeaveButtonClick?.Invoke();
             }
             GUILayout.EndArea();
         }
