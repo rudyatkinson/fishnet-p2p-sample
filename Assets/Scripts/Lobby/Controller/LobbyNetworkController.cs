@@ -19,7 +19,7 @@ using VContainer;
 
 namespace RudyAtkinson.Lobby.Controller
 {
-    public class LobbyServerController: NetworkBehaviour
+    public class LobbyNetworkController: NetworkBehaviour
     {
         private NetworkManager _networkManager;
         private LobbyPlayerViewFactory _lobbyPlayerViewFactory;

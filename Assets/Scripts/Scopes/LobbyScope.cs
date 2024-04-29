@@ -14,13 +14,13 @@ namespace RudyAtkinson.Scopes
     public class LobbyScope : LifetimeScope
     {
         [SerializeField] private LobbyView _lobbyView;
-        [SerializeField] private LobbyServerController _lobbyServerController;
+        [SerializeField] private LobbyNetworkController lobbyNetworkController;
         [SerializeField] private LobbyPlayerView _lobbyPlayerView;
         
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponent(_lobbyView);
-            builder.RegisterComponent(_lobbyServerController);
+            builder.RegisterComponent(lobbyNetworkController);
             builder.RegisterComponent(_lobbyPlayerView);
 
             builder.Register<LobbyController>(Lifetime.Singleton).AsImplementedInterfaces();
