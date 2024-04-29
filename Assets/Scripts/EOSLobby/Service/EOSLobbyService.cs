@@ -6,7 +6,7 @@ using Epic.OnlineServices.Lobby;
 using FishNet.Plugins.FishyEOS.Util;
 using FishNet.Transporting.FishyEOSPlugin;
 using RudyAtkinson.EOSLobby.Repository;
-using RudyAtkinson.EOSLobby.Yield;
+using RudyAtkinson.EOSLobby.Utility;
 using RudyAtkinson.Lobby.Repository;
 using UniRx;
 using UnityEngine;

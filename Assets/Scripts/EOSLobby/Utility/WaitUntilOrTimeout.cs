@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace RudyAtkinson.EOSLobby.Yield
+namespace RudyAtkinson.EOSLobby.Utility
 {
     public class WaitUntilOrTimeout : CustomYieldInstruction
     {
